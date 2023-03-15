@@ -36,26 +36,27 @@ Player_VBlank:
     ina
     sta player.oam_objects.1.x, X
     
-    lda engine.oam_objects.1.y, X
+    lda player.oam_objects.1.y, X
     ina
     ina
     ina
-    sta engine.oam_objects.1.y, X
+    sta player.oam_objects.1.y, X
 
     lda player.oam_objects.2.x, X
     ina
     ina
     sta player.oam_objects.2.x, X
     
-    lda engine.oam_objects.2.y, X
+    lda player.oam_objects.2.y, X
     ina
     ina
     ina
-    sta engine.oam_objects.2.y, X
+    sta player.oam_objects.2.y, X
     A16_XY16
 
     call(OAMObject_Write, player.oam_objects.1)  
     call(OAMObject_Write, player.oam_objects.2) 
+
     rts
 
 .ends
