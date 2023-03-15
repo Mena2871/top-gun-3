@@ -1,3 +1,7 @@
+UPBTN       = $0800
+DWNBTN      = $0400
+LFTBTN      = $0200
+RHTBTN      = $0100
 INIDISP     = $2100    ; Screen Display Register
 OBSEL       = $2101    ; Object Size and Character Size Register
 OAMADDL     = $2102    ; OAM Address Registers (Low)

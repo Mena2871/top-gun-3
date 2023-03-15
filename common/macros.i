@@ -153,7 +153,7 @@
 ;  - FUNCTION: The function to call
 ;  - OFFSET: The offset of the "this" pointer
 ;
-.macro call_ptr ARGS FUNCTION, OFFSET, X_OFFSET
+.macro call_ptr ARGS FUNCTION, OFFSET
     phx             ; Preserve the X register
     pha             ; Preserve the accumulator
     txa             ; Load the "this" pointer

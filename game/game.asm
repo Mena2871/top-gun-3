@@ -1,6 +1,7 @@
 .include "game/sprites.i"
 .include "game/maps.i"
 .include "engine/engine.asm"
+.include "game/player.asm"
 
 .ACCU	16
 .INDEX	16
@@ -13,6 +14,7 @@ nop ; This is here to prevent the compiler from optimizing the label away
     frame_counter dw            ; Frame counter (increments every frame)
     map dw                      ; Pointer to the map struct (current map)
     engine instanceof Engine    ; Pointer to the engine struct
+    player instanceof Player
 .endst
 
 ; Intentionally offset at $0000 since we will use the X register to
@@ -74,6 +76,11 @@ Game_Init:
     sta TM
 
     A16_XY16
+
+    
+    ; Initialize the player
+    call(Player_Init, game.player)
+
     plx
     ply
     pla
@@ -86,6 +93,15 @@ Game_Init:
 ;
 Game_VBlank:
     call(Engine_VBlank, game.engine) ; Equivalent to this->engine.vblank()
+    call(Player_VBlank, game.player)
     rts
+
+; Game_CheckPlayerStart:
+;     ; call inputclass to check which players have start\
+;     bne @Done
+
+;     @Done:
+
+;     rts
 
 .ends
