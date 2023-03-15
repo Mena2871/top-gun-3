@@ -15,7 +15,6 @@ nop
 Player_Init:
     ; Init Input
     call(Input_Init, player.input)
-    A8_XY16
 
     ; Init the Player Sprite
     ldy #$08
@@ -25,8 +24,7 @@ Player_Init:
     ldy #$09
     call(OAMObject_RandomInit, player.oam_objects.2)
     call(OAMObject_Write, player.oam_objects.2)
-
-    A16_XY16
+    
     rts
 
 Player_VBlank:
