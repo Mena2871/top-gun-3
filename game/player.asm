@@ -4,7 +4,8 @@ nop
 
 .struct Player
     input instanceof Input
-    oam_objects instanceof OAMObject 3 
+    oam_manager instanceof OAMManager
+    oam_obj_ptr dw ; Pointer to the requested OAM object
     enabled db
 .endst
 
@@ -13,48 +14,64 @@ nop
 .ende
 
 Player_Init:
+    phy
+
     ; Init Input
     call(Input_Init, player.input)
 
     ; Init the Player Sprite
-    ldy #$08
-    call(OAMObject_RandomInit, player.oam_objects.1)
-    call(OAMObject_Write, player.oam_objects.1)
+    call(OAMManager_Init, player.oam_manager)
+    jsr Player_OAMRequest
 
-    ldy #$09
-    call(OAMObject_RandomInit, player.oam_objects.2)
-    call(OAMObject_Write, player.oam_objects.2)
-    
+    ply
+    rts
+
+Player_OAMRequest:
+    pha
+    phy
+    call(OAMManager_Request, player.oam_manager) ; Request 1 OAM object
+
+    ; VRAM address 0 is a transparent tile. 1 is a grass tile in the test.
+    A8
+    lda #1
+    sta oam_object.vram, Y
+    A16
+
+    ; Save the pointer for testing later
+    tya
+    sta player.oam_obj_ptr, X
+
+    ply
+    pla
     rts
 
 Player_VBlank:
-    A8_XY16
-    lda player.oam_objects.1.x, X
-    ina
-    ina
-    sta player.oam_objects.1.x, X
-    
-    lda player.oam_objects.1.y, X
-    ina
-    ina
-    ina
-    sta player.oam_objects.1.y, X
+    pha
 
-    lda player.oam_objects.2.x, X
-    ina
-    ina
-    sta player.oam_objects.2.x, X
-    
-    lda player.oam_objects.2.y, X
-    ina
-    ina
-    ina
-    sta player.oam_objects.2.y, X
-    A16_XY16
+    jsr Player_MoveTestObject
+    call(OAMManager_VBlank, player.oam_manager)
 
-    call(OAMObject_Write, player.oam_objects.1)  
-    call(OAMObject_Write, player.oam_objects.2) 
-
+    pla
     rts
 
+Player_MoveTestObject:
+    pha
+    phx
+
+    ; Load pointer to OAM object
+    lda player.oam_obj_ptr, X
+    tax
+
+    A8
+
+    ; Load OAM object and add 1 to x position and y position
+    inc oam_object.x, X
+    ; inc oam_object.y, X
+    stz oam_object.clean, X
+
+    A16
+
+    plx
+    pla
+    rts
 .ends

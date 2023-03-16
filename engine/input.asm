@@ -39,7 +39,3 @@ Input_VBlank:
     rts
 
 .ends
-
-.section "Input" BANK 0 SLOT "ROM"
-
-.ends
