@@ -19,8 +19,6 @@ Player_Init:
     ; Init Input
     call(Input_Init, player.input)
 
-    ; Init the Player Sprite
-    call(OAMManager_Init, player.oam_manager)
     jsr Player_OAMRequest
 
     ply

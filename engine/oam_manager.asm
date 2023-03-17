@@ -96,7 +96,7 @@ OAMManager_Request:
 
         bne @Next
 
-    ; If we got here, then we found a free object. Mark ita llocated
+    ; If we got here, then we found a free object. Mark it allocated
     lda #1
     sta oam_object.allocated, X
 
