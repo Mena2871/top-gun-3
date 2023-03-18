@@ -4,7 +4,6 @@ nop
 
 .struct Player
     input instanceof Input
-    oam_manager instanceof OAMManager
     oam_obj_ptr dw ; Pointer to the requested OAM object
     enabled db
 .endst
@@ -27,7 +26,7 @@ Player_Init:
 Player_OAMRequest:
     pha
     phy
-    call(OAMManager_Request, player.oam_manager) ; Request 1 OAM object
+    call_ptr(OAMManager_Request, engine.oam_manager) ; Request 1 OAM object
 
     ; VRAM address 0 is a transparent tile. 1 is a grass tile in the test.
     A8
@@ -46,25 +45,25 @@ Player_OAMRequest:
 Player_VBlank:
     pha
 
-    jsr Player_MoveTestObject
-    call(OAMManager_VBlank, player.oam_manager)
+    call(Input_VBlank, player.input)
+    jsr Player_Input
+    call_ptr(OAMManager_VBlank, engine.oam_manager)
 
     pla
     rts
 
-Player_MoveTestObject:
+Player_Input:
     pha
     phx
 
     ; Load pointer to OAM object
     lda player.oam_obj_ptr, X
+    jsr Player_UpBtn
     tax
 
     A8
-
     ; Load OAM object and add 1 to x position and y position
     inc oam_object.x, X
-    ; inc oam_object.y, X
     stz oam_object.clean, X
 
     A16
@@ -72,4 +71,21 @@ Player_MoveTestObject:
     plx
     pla
     rts
+
+Player_UpBtn:
+    phy
+
+    ldy player.input.inputstate.upbtn, X
+    cpy #1
+    bne @Done
+
+    tax
+    A8
+    inc oam_object.y, X
+
+    @Done:
+        A16
+        ply
+        rts
+
 .ends

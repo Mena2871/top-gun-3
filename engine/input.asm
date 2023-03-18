@@ -13,6 +13,7 @@ nop
 
 .struct Input
     inputstate instanceof InputState
+    enabled db
 .endst
 
 .enum $00
@@ -20,22 +21,35 @@ nop
 .ende
 
 Input_Init:
+    stz input.inputstate.upbtn, X
     rts
 
 Input_Frame:
     rts
 
-; X is "this" pointer
 Input_VBlank:
     pha
-
-    lda JOY1L
-    lda JOY1H
-
-    lda #$FF
-
-
+    jsr Input_UpButton
     pla
     rts
+
+Input_UpButton:
+    pha
+    @CheckUpButton:
+        lda JOY1L                          ; check whether the up button was pressed this frame...
+        cmp #UPBTN
+        bne @CheckUpButtonDone 
+        lda #1
+        sta input.inputstate.upbtn, X
+        bra @Done
+
+    @CheckUpButtonDone:
+        lda #0
+        sta input.inputstate.upbtn, X
+        bra @Done
+
+    @Done:
+        pla
+        rts
 
 .ends
