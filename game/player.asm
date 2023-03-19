@@ -3,9 +3,10 @@
 nop
 
 .struct Player
+    oam_manager_ptr instanceof OAMManager
     input instanceof Input
     oam_obj_ptr dw ; Pointer to the requested OAM object
-    enabled db
+    ; enabled db
 .endst
 
 .enum $0000
@@ -13,20 +14,29 @@ nop
 .ende
 
 Player_Init:
+    pha
     phy
+    phx
 
     ; Init Input
     call(Input_Init, player.input)
+    call(OAMManager_Init, player.oam_manager_ptr)
+    txa
+    clc
+    adc #player.oam_manager_ptr
+    tay
 
     jsr Player_OAMRequest
 
+    plx
     ply
+    pla
     rts
 
 Player_OAMRequest:
     pha
     phy
-    call_ptr(OAMManager_Request, engine.oam_manager) ; Request 1 OAM object
+    call_ptr(OAMManager_Request, player.oam_manager_ptr) ; Request 1 OAM object
 
     ; VRAM address 0 is a transparent tile. 1 is a grass tile in the test.
     A8
@@ -47,7 +57,7 @@ Player_VBlank:
 
     call(Input_VBlank, player.input)
     jsr Player_Input
-    call_ptr(OAMManager_VBlank, engine.oam_manager)
+    call_ptr(OAMManager_VBlank, player.oam_manager_ptr)
 
     pla
     rts
