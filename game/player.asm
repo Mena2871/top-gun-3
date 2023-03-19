@@ -59,14 +59,10 @@ Player_Input:
     ; Load pointer to OAM object
     lda player.oam_obj_ptr, X
     jsr Player_UpBtn
+    jsr Player_DnBtn
+    jsr Player_LftBtn
+    jsr Player_RhtBtn
     tax
-
-    A8
-    ; Load OAM object and add 1 to x position and y position
-    inc oam_object.x, X
-    stz oam_object.clean, X
-
-    A16
 
     plx
     pla
@@ -81,8 +77,56 @@ Player_UpBtn:
 
     tax
     A8
-    inc oam_object.y, X
+    dec oam_object.y, X
+    stz oam_object.clean, X
+    @Done:
+        A16
+        ply
+        rts
 
+Player_DnBtn:
+    phy
+
+    ldy player.input.inputstate.dnbtn, X
+    cpy #1
+    bne @Done
+
+    tax
+    A8
+    inc oam_object.y, X
+    stz oam_object.clean, X
+    @Done:
+        A16
+        ply
+        rts
+
+Player_LftBtn:
+    phy
+
+    ldy player.input.inputstate.lftbtn, X
+    cpy #1
+    bne @Done
+
+    tax
+    A8
+    dec oam_object.x, X
+    stz oam_object.clean, X
+    @Done:
+        A16
+        ply
+        rts
+
+Player_RhtBtn:
+    phy
+
+    ldy player.input.inputstate.rhtbtn, X
+    cpy #1
+    bne @Done
+
+    tax
+    A8
+    inc oam_object.x, X
+    stz oam_object.clean, X
     @Done:
         A16
         ply

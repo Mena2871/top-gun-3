@@ -1,5 +1,5 @@
 UPBTN       = $0800
-DWNBTN      = $0400
+DNBTN      = $0400
 LFTBTN      = $0200
 RHTBTN      = $0100
 INIDISP     = $2100    ; Screen Display Register
