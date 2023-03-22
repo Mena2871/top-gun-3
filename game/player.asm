@@ -3,10 +3,9 @@
 nop
 
 .struct Player
-    oam_manager_ptr instanceof OAMManager
+    oam_manager_ptr  dw
+    oam_obj_ptr      dw ; Pointer to the requested OAM object
     input instanceof Input
-    oam_obj_ptr dw ; Pointer to the requested OAM object
-    ; enabled db
 .endst
 
 .enum $0000
@@ -14,23 +13,13 @@ nop
 .ende
 
 Player_Init:
-    pha
     phy
-    phx
 
     ; Init Input
     call(Input_Init, player.input)
-    call(OAMManager_Init, player.oam_manager_ptr)
-    txa
-    clc
-    adc #player.oam_manager_ptr
-    tay
-
     jsr Player_OAMRequest
 
-    plx
     ply
-    pla
     rts
 
 Player_OAMRequest:
@@ -44,7 +33,6 @@ Player_OAMRequest:
     sta oam_object.vram, Y
     A16
 
-    ; Save the pointer for testing later
     tya
     sta player.oam_obj_ptr, X
 
@@ -57,7 +45,6 @@ Player_VBlank:
 
     call(Input_VBlank, player.input)
     jsr Player_Input
-    call_ptr(OAMManager_VBlank, player.oam_manager_ptr)
 
     pla
     rts

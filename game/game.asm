@@ -67,9 +67,11 @@ Game_Init:
     ; Render one frame to initialize the screen
     jsr Game_VBlank
 
-    A16_XY16
+    A16_XY16    
+    txa                             ; X points to game
+    adc #game.engine.oam_manager  ; Pointer arithmetic to get to `engine.oam_manager`
+    sta game.player.oam_manager_ptr, X ; Set the pointer on the game
 
-    
     ; Initialize the player
     call(Player_Init, game.player)
 

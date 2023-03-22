@@ -1,8 +1,11 @@
 .include "engine/drivers/input/interface.asm"
 
-.section "Input" BANK 0 SLOT "ROM"
+.define UPBTN   $0800
+.define DNBTN   $0400
+.define LFTBTN  $0200
+.define RHTBTN  $0100
 
-nop
+.section "Input" BANK 0 SLOT "ROM"
 
 .struct InputState
     index  db
