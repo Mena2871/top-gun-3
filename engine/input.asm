@@ -31,8 +31,8 @@
 
 Input_Init:
     A8
-    stz input.inputstate.upbtn, X
     stz input.inputstate.dnbtn, X
+    stz input.inputstate.upbtn, X
     stz input.inputstate.rhtbtn, X
     stz input.inputstate.lftbtn, X
     A16
@@ -50,8 +50,8 @@ Input_VBlank:
         and #1
         bne @WaitForJoyReady
 
-    jsr Input_UpButton
     jsr Input_DnButton
+    jsr Input_UpButton
     jsr Input_LftButton
     jsr Input_RhtButton
     pla
@@ -61,8 +61,8 @@ Input_DnButton:
     pha
     @CheckDnButton:
         lda JOY1L                          ; check whether the Dn button was pressed this frame...
-        cmp #DNBTN
-        bne @CheckDnButtonDone 
+        bit #DNBTN
+        beq @CheckDnButtonDone 
         A8
         lda #1
         sta input.inputstate.dnbtn, X
@@ -83,8 +83,8 @@ Input_UpButton:
     pha
     @CheckUpButton:
         lda JOY1L                          ; check whether the up button was pressed this frame...
-        cmp #UPBTN
-        bne @CheckUpButtonDone 
+        bit #UPBTN
+        beq @CheckUpButtonDone 
         A8
         lda #1
         sta input.inputstate.upbtn, X
@@ -105,8 +105,8 @@ Input_LftButton:
     pha
     @CheckLftButton:
         lda JOY1L                          ; check whether the lft button was pressed this frame...
-        cmp #LFTBTN
-        bne @CheckLftButtonDone 
+        bit #LFTBTN
+        beq @CheckLftButtonDone 
         A8
         lda #1
         sta input.inputstate.lftbtn, X
@@ -127,8 +127,8 @@ Input_RhtButton:
     pha
     @CheckRhtButton:
         lda JOY1L                          ; check whether the rht button was pressed this frame...
-        cmp #RHTBTN
-        bne @CheckRhtButtonDone 
+        bit #RHTBTN
+        beq @CheckRhtButtonDone 
         A8
         lda #1
         sta input.inputstate.rhtbtn, X
