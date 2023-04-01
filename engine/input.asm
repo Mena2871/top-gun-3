@@ -3,21 +3,21 @@
 .ACCU   16
 .INDEX  16
 
-.define UPBTN   $0800
-.define DNBTN   $0400
-.define LFTBTN  $0200
-.define RHTBTN  $0100
-
 .section "Input" BANK 0 SLOT "ROM"
 
 .struct InputState
-    index  db
+    rbtn   db
+    lbtn   db
+    xbtn   db
+    abtn   db
+    rhtbtn db
+    lftbtn db   
+    dnbtn  db
+    upbtn  db
     start  db
     select db
-    upbtn  db
-    dnbtn  db
-    lftbtn db
-    rhtbtn db
+    ybtn   db
+    bbtn   db
 .endst
 
 .struct Input
@@ -31,10 +31,18 @@
 
 Input_Init:
     A8
-    stz input.inputstate.dnbtn, X
+    stz input.inputstate.bbtn, X
+    stz input.inputstate.ybtn, X
+    stz input.inputstate.select, X
+    stz input.inputstate.start, X
     stz input.inputstate.upbtn, X
-    stz input.inputstate.rhtbtn, X
+    stz input.inputstate.dnbtn, X
     stz input.inputstate.lftbtn, X
+    stz input.inputstate.rhtbtn, X
+    stz input.inputstate.abtn, X
+    stz input.inputstate.xbtn, X
+    stz input.inputstate.lbtn, X
+    stz input.inputstate.rbtn, X
     A16
     rts
 
@@ -50,98 +58,46 @@ Input_VBlank:
         and #1
         bne @WaitForJoyReady
 
-    jsr Input_DnButton
-    jsr Input_UpButton
-    jsr Input_LftButton
-    jsr Input_RhtButton
+    jsr Input_Buttons
     pla
     rts
 
-Input_DnButton:
+Input_Buttons:
     pha
-    @CheckDnButton:
-        lda JOY1L                          ; check whether the Dn button was pressed this frame...
-        bit #DNBTN
-        beq @CheckDnButtonDone 
-        A8
-        lda #1
-        sta input.inputstate.dnbtn, X
-        bra @Done
+    clc
+    lda JOY1L
+    ; Skip controller id    
+    lsr A
+    lsr A
+    lsr A
+    lsr A
 
-    @CheckDnButtonDone:
+    ldy #12
+    pha
+    txa
+    adc #input.inputstate
+    tax
+    pla
+    clc
+    @Loop:
+        lsr A
+        pha
         A8
         lda #0
-        sta input.inputstate.dnbtn, X
-        bra @Done
+        adc #$00
+        sta input.inputstate, X
+        A16
+        pla
+        inx
+        dey
+        bne @Loop
+
+    ldy #0
+    bra @Done
 
     @Done:
-        A16
+        clc
         pla
         rts
 
-Input_UpButton:
-    pha
-    @CheckUpButton:
-        lda JOY1L                          ; check whether the up button was pressed this frame...
-        bit #UPBTN
-        beq @CheckUpButtonDone 
-        A8
-        lda #1
-        sta input.inputstate.upbtn, X
-        bra @Done
-
-    @CheckUpButtonDone:
-        A8
-        lda #0
-        sta input.inputstate.upbtn, X
-        bra @Done
-
-    @Done:
-        A16
-        pla
-        rts
-
-Input_LftButton:
-    pha
-    @CheckLftButton:
-        lda JOY1L                          ; check whether the lft button was pressed this frame...
-        bit #LFTBTN
-        beq @CheckLftButtonDone 
-        A8
-        lda #1
-        sta input.inputstate.lftbtn, X
-        bra @Done
-
-    @CheckLftButtonDone:
-        A8
-        lda #0
-        sta input.inputstate.lftbtn, X
-        bra @Done
-
-    @Done:
-        A16
-        pla
-        rts
-
-Input_RhtButton:
-    pha
-    @CheckRhtButton:
-        lda JOY1L                          ; check whether the rht button was pressed this frame...
-        bit #RHTBTN
-        beq @CheckRhtButtonDone 
-        A8
-        lda #1
-        sta input.inputstate.rhtbtn, X
-        bra @Done
-
-    @CheckRhtButtonDone:
-        A8
-        lda #0
-        sta input.inputstate.rhtbtn, X
-        bra @Done
-
-    @Done:
-        A16
-        pla
-        rts
 .ends
