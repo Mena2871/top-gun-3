@@ -64,7 +64,6 @@ Input_VBlank:
 
 Input_Buttons:
     pha
-    clc
     lda JOY1L
     ; Skip controller id    
     lsr A
@@ -80,14 +79,9 @@ Input_Buttons:
     pla
     clc
     @Loop:
-        lsr A
-        pha
-        A8
-        lda #0
-        adc #$00
-        sta input.inputstate, X
-        A16
-        pla
+        stz input.inputstate, X ; 5 cycles
+        lsr A                   ; 2 cycles
+        rol input.inputstate, X ; 7 cycles
         inx
         dey
         bne @Loop
@@ -96,7 +90,6 @@ Input_Buttons:
     bra @Done
 
     @Done:
-        clc
         pla
         rts
 
