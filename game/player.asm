@@ -5,7 +5,7 @@ nop
 .struct Player
     id               db ; Player ID
     oam_obj_ptr      dw ; Pointer to the requested OAM object
-    input instanceof Input
+    input_obj_ptr    dw ;
 .endst
 
 .enum $0000
@@ -21,7 +21,7 @@ Player_Init:
     A16
 
     ; Init Input
-    call(Input_Init, player.input)
+    ; call(Input_Init, player.input)
     jsr Player_OAMRequest
 
     ply
@@ -32,7 +32,7 @@ Player_OAMRequest:
     phy
 
     jsr OAMManager_Request
-
+    jsr InputManager_Request
     ; VRAM address 0 is a transparent tile. 1 is a grass tile in the test.
     A8
     lda #1
@@ -58,7 +58,7 @@ Player_Frame:
 Player_VBlank:
     pha
 
-    call(Input_VBlank, player.input)
+    ; call(Input_VBlank, player.input)
 
     pla
     rts
@@ -69,87 +69,87 @@ Player_Input:
 
     ; Load pointer to OAM object
     lda player.oam_obj_ptr, X
-    jsr Player_UpBtn
-    jsr Player_DnBtn
-    jsr Player_LftBtn
-    jsr Player_RhtBtn
+    ; jsr Player_UpBtn
+    ; jsr Player_DnBtn
+    ; jsr Player_LftBtn
+    ; jsr Player_RhtBtn
     tax
 
     plx
     pla
     rts
 
-Player_UpBtn:
-    phx
-    phy
+; Player_UpBtn:
+;     phx
+;     phy
 
-    ldy player.input.inputstate.upbtn, X
-    cpy #1
-    bne @Done
+;     ldy player.input.inputstate.upbtn, X
+;     cpy #1
+;     bne @Done
 
-    tax
-    A8
-    dec oam_object.y, X
-    A16
-    jsr OAM_MarkDirty
-    @Done:
-        ply
-        plx
-        rts
+;     tax
+;     A8
+;     dec oam_object.y, X
+;     A16
+;     jsr OAM_MarkDirty
+;     @Done:
+;         ply
+;         plx
+;         rts
 
-Player_DnBtn:
-    phx
-    phy
+; Player_DnBtn:
+;     phx
+;     phy
 
-    ldy player.input.inputstate.dnbtn, X
-    cpy #1
-    bne @Done
+;     ldy player.input.inputstate.dnbtn, X
+;     cpy #1
+;     bne @Done
 
-    tax
-    A8
-    inc oam_object.y, X
-    A16
+;     tax
+;     A8
+;     inc oam_object.y, X
+;     A16
 
-    jsr OAM_MarkDirty
-    @Done:
-        ply
-        plx
-        rts
+;     jsr OAM_MarkDirty
+;     @Done:
+;         ply
+;         plx
+;         rts
 
-Player_LftBtn:
-    phx
-    phy
+; Player_LftBtn:
+;     phx
+;     phy
 
-    ldy player.input.inputstate.lftbtn, X
-    cpy #1
-    bne @Done
+;     ldy player.input.inputstate.lftbtn, X
+;     cpy #1
+;     bne @Done
 
-    tax
-    A8
-    dec oam_object.x, X
-    A16
-    jsr OAM_MarkDirty
-    @Done:
-        ply
-        plx
-        rts
+;     tax
+;     A8
+;     dec oam_object.x, X
+;     A16
+;     jsr OAM_MarkDirty
+;     @Done:
+;         ply
+;         plx
+;         rts
 
-Player_RhtBtn:
-    phx
-    phy
+; Player_RhtBtn:
+;     phx
+;     phy
 
-    ldy player.input.inputstate.rhtbtn, X
-    cpy #1
-    bne @Done
+;     ldy player.input.inputstate.rhtbtn, X
+;     cpy #1
+;     bne @Done
 
-    tax
-    A8
-    inc oam_object.x, X
-    A16
-    jsr OAM_MarkDirty
-    @Done:
-        ply
-        plx
-        rts
+;     tax
+;     A8
+;     inc oam_object.x, X
+;     A16
+;     jsr OAM_MarkDirty
+;     @Done:
+;         ply
+;         plx
+;         rts
 
 .ends
