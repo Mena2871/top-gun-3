@@ -72,31 +72,42 @@ Input_VBlank:
         and #1
         bne @WaitForJoyReady
 
-    A8
-    lda JOYSER0
-    lda JOYSER1
-    A16
     ; Advance the pointer to the first OAM object in the struct
     clc
     lda #input_manager.input_objects
     tax
+    pha
+    lda #JOY1L
+    pha
     ldy #0
         @Loop:
+            pla
             jsr Input_Buttons
+            adc #2
+            pha
+            lda 3, s
             clc
             adc #_sizeof_InputState 
+            sta 3, s
             tax 
             iny                     
             cpy #MAX_INPUTS    
             bne @Loop
+    pla
+    pla
     pla
     rts
 
 Input_Buttons:
     pha
     phy
-    lda JOY1L
-    ; Skip controller id    
+
+    phx
+    tax
+    lda $00, x
+    plx
+
+    ; Skip controller id
     lsr A
     lsr A
     lsr A
