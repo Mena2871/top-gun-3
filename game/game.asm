@@ -197,7 +197,6 @@ Game_VBlank:
     jsr Engine_VBlank
 
     ldx #game.player
-    jsr Player_VBlank
 
     rts
 

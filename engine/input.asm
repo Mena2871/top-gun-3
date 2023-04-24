@@ -3,7 +3,7 @@
 .ACCU   16
 .INDEX  16
 
-.define MAX_INPUTS 5
+.define MAX_INPUTS 2
 
 .struct InputState
     index  db
@@ -203,7 +203,7 @@ InputManager_Request:
         adc #_sizeof_InputState   ; Advance the pointer
         tax
 
-        ; Did we reach the end of the OAM object space?
+        ; Did we reach the end of the INPUT object space?
         iny
         cpy #MAX_INPUTS
         beq @Error
@@ -218,7 +218,7 @@ InputManager_Request:
     lda #1
     sta inputstate.allocated, X
 
-    ; Return the address of the OAM object
+    ; Return the address of the INPUT object
     txy
     bra @Done
 
