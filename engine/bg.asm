@@ -5,8 +5,8 @@
 
 ; Remember, thse are 16-bit words, so the actual VRAM byte address is 2x the value.
 .define BG1_CHAR_VRAM    $2000
-.define BG2_CHAR_VRAM    $3000
-.define BG3_CHAR_VRAM    $4000
+.define BG2_CHAR_VRAM    $2000
+.define BG3_CHAR_VRAM    $6000
 .define BG4_CHAR_VRAM    $5000
 
 ;
@@ -63,7 +63,7 @@ BGManager_Init:
     ; Enable Mode 1 with 8x8 characters for all sizes
     ; BG3 is set to high priority
     ; Size is 8x8 characters for all BG modes.
-    lda #%00001001
+    lda #%00111001
     sta BGMODE
 
     ; 8x8 characters at 32x32 tiles at 4BPP

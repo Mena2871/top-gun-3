@@ -7,6 +7,7 @@
 .include "engine/map.asm"
 .include "engine/oam.asm"
 .include "engine/timer.asm"
+.include "engine/renderer.asm"
 
 .struct Engine
     frame_counter dw
@@ -31,6 +32,7 @@ Engine_Init:
     jsr MapManager_Init
     jsr FontManager_Init
     jsr InputManager_Init
+    jsr Renderer_Init
 
     ;        S4321
     lda #%00010111
@@ -46,6 +48,7 @@ Engine_Frame:
     rts
 
 Engine_VBlank:
+    jsr Renderer_VBlank
     jsr TimerManager_VBlank
     jsr OAMManager_VBlank
     jsr FontManager_VBlank

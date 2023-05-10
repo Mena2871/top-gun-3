@@ -145,10 +145,12 @@ FontManager_Load:
 
     ; Preserve the font pointer
     A16
+    pha
     tya
     sta font_manager.fonts.1.font_header_ptr.w
+    pla
 
-    ; Set the font header pointer
+    ; Set the font bank
     A8
     pha
     plb

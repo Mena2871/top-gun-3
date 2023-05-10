@@ -13,3 +13,4 @@ out/
 *.sym
 *venv*
 _internal
+*.tiled-session

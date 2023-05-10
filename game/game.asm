@@ -97,9 +97,13 @@ Game_Init:
     jsr Memset
 
     ; Load a demo map
-    lda #Map_Demo@Bank
-    ldy #Map_Demo@Data
+    lda #Map_Skyscraper@Bank
+    ldy #Map_Skyscraper@Data
     jsr MapManager_Load
+
+    ; HACK(jbvh): Just to make the vertical offset pretty for now
+    lda #255
+    sta renderer.bg_screen.1.v_offset.w
 
     ; Initialize all font data
     jsr Game_FontInit
@@ -195,6 +199,7 @@ Game_FontInit:
 ;
 Game_VBlank:
     jsr Engine_VBlank
+    ;jsr Renderer_TestHScroll
 
     ldx #game.player
 

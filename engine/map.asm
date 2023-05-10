@@ -2,11 +2,21 @@
 .INDEX  16
 .16bit
 
-
+;
+; Background tile data
+;
 .struct Tile
-    id          db ; ID of the tile
-    version     db ;
+    id          dw ; 10-bit ID of the tile
     index       dw ; 8x8 32-width index
+.endst
+
+;
+; Represents a background layer in the map
+;
+.struct Background
+    id          dw    ; 8-bit ID of the background layer (1..4)
+    num_tiles   dw    ; Number of tiles in the background
+    data        db    ; Where all the tile data starts
 .endst
 
 ;
@@ -37,20 +47,20 @@
 ; Map data is stored in the following format:
 ;
 .struct Map
-    magic          ds 3  ; "TMX"
-    version        db    ; Version of the map format
-    name           ds 16 ; Name of the map
-    num_tiles      dw    ; Number of tiles in the map
-    num_objects    dw    ; Number of objects in the map
-    tile_width     db ; Width of a tile in pixels
-    tile_height    db ; Height of a tile in pixels
-    height         db ; Height in tiles of tile_height
-    width          db ; Width in tiles of tile_width
+    magic               ds 3    ; "TMX"
+    version             db      ; Version of the map format
+    name                ds 16   ; Name of the map
+    num_backgrounds     db      ; Number of objects in the map
+    num_objects         db      ; Number of objects in the map
+    tile_width          db      ; Width of a tile in pixels
+    tile_height         db      ; Height of a tile in pixels
+    height              db      ; Height in tiles of tile_height
+    width               db      ; Width in tiles of tile_width
     ; These are all relative to the start of the map struct
-    tile_offset    dw ; Where all the tile data starts
-    sprite_offset  dw ; Where all the map data starts
-    palette_offset dw ; Where all the palette data starts
-    object_offset  dw ; Where all the objects in the map go
+    background_offset   dw      ; Where all the tile data starts
+    sprite_offset       dw      ; Where all the map data starts
+    palette_offset      dw      ; Where all the palette data starts
+    object_offset       dw      ; Where all the objects in the map go
 .endst
 
 ;
@@ -75,6 +85,9 @@
 .ende
 .enum $0000
     tile instanceof Tile
+.ende
+.enum $0000
+    bg_layer instanceof Background
 .ende
 
 .ramsection "MapRAM" appendto "RAM"
@@ -259,7 +272,7 @@ Map_Load:
 
     ; There is far more setup for loading tiles, so pass
     ; the Map object to it
-    jsr Map_LoadTiles
+    jsr Map_LoadBackgrounds
 
     ; Restore the stack
     plx
@@ -365,14 +378,60 @@ Map_LoadPalettes:
     rts
 
 ;
+; Read all backgrounds from the map into vram
+;
+Map_LoadBackgrounds:
+    phy
+    phx
+
+    ; Put the number of tiles on the stack
+    lda map.num_backgrounds, X
+    and #$FF
+    tay
+
+    ; Now, we need to load the tilemap data into VRAM
+    clc
+    lda map.background_offset, X
+    adc 1, S
+    tax
+
+    @Loop:
+        cpy #$00
+        beq @Done
+
+        lda bg_layer.id, X
+        cmp #$01
+        beq @BG1
+        bra @BG2
+
+        @BG1:
+            lda #BG1_TILEMAP_VRAM
+            bra @LoadTiles
+
+        @BG2:
+            lda #BG2_TILEMAP_VRAM
+            bra @LoadTiles
+
+        @LoadTiles:
+            jsr Map_LoadTiles
+            dey
+            bra @Loop
+
+    @Done:
+        pla
+        plx
+        ply
+        rts
+
+;
 ; Read all the tiles data from the map into bgmap
-; Expects that X register points to the palette object
-; Expects that Y register points to the engine object
+; Expects that A register points to the background tilemap VRAM
+; Expects that X register points to the background layer object
 ; Does not need to preserve any register.
 ;
 Map_LoadTiles:
     phy
-    phx
+    pha
 
     ; 8-bit background mode for all modes
     A8
@@ -381,43 +440,29 @@ Map_LoadTiles:
 
     A16
     ; Put the number of tiles on the stack
-    lda map.num_tiles, X
+    lda bg_layer.num_tiles, X
     tay
 
-    ; First get the bgtile offset (which is end of sprite)
+    ; First get the bgtile offset (which is end of background)
     clc
-    lda map.sprite_offset, X
-    adc 1, S
-    tax
-
-    ; This is the number of bytes into vram we should expect
-    lda sprite_sheet.size, X
-
-    ; Put the sprite sheet on the stack
-    pha
-
-    ; Put the map pointer back into the X register (+2 bytes)
-    lda 3, S
-    tax
-
-    ; Now, we need to load the tilemap data into VRAM
-    clc
-    lda map.tile_offset, X
-    adc 3, S
+    txa
+    adc #bg_layer.data
     tax
 
     @LoadTile:
         ; Set the tilemap address
         clc
-        lda tile.index, X
-        adc #BG1_TILEMAP_VRAM   ; This is hacky.
+        lda tile.index.w, X
+        adc 1, S
         sta VMADDL
 
         ; Save tile reference
-        lda tile.id, X
-        dea
+        lda tile.id.w, X
+        A8
         sta VMDATAL
-        stz VMDATAH
+        xba
+        sta VMDATAH
+        A16
 
         ; Advance the pointer
         txa
@@ -430,7 +475,6 @@ Map_LoadTiles:
 
     ; Restore the stack
     pla
-    plx
     ply
 
     rts

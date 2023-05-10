@@ -5,6 +5,6 @@
 
 .section "Strings" bank 1 slot "ROM"
 
-definetext(1, "TopGun3", "Top Gun 3")
+definetext(1, "TopGun3", "Test Text")
 
 .ends

@@ -3,6 +3,6 @@
 Map_{_name}@Data: .incbin resources/maps/{_name}.bin
 .endm
 
-.section "Maps" bank 1 slot "ROM"
-incmap(1, "Demo")
+.section "Maps" bank 2 slot "ROM"
+incmap(2, "Skyscraper")
 .ends

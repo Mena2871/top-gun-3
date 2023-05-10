@@ -75,16 +75,20 @@ class Exporter:
 
 class Tile(Exporter):
     fields = [
-        ('id', 'B'),
-        ('version', 'B'),
+        ('id', 'H'),
         ('index', 'H'),
     ]
 
     def __init__(self, pk, version, index):
         super().__init__()
         self.id = pk
-        self.version = version
         self.index = index
+
+class Background(Exporter):
+    fields = [
+        ('id', 'H'),
+        ('num_tiles', 'H'),
+    ]
 
 
 class SpriteSheet(Exporter):
@@ -111,13 +115,13 @@ class Map(Exporter):
         ('magic', '3B'),
         ('version', 'B'),
         ('name', '16B'),
-        ('num_tiles', 'H'),
-        ('num_objects', 'H'),
+        ('num_backgrounds', 'B'),
+        ('num_objects', 'B'),
         ('tile_width', 'B'),
         ('tile_height', 'B'),
         ('height', 'B'),
         ('width', 'B'),
-        ('tile_offset', 'H'),
+        ('background_offset', 'H'),
         ('sprite_offset', 'H'),
         ('palette_offset', 'H'),
         ('object_offset', 'H'),
@@ -151,36 +155,47 @@ class Map(Exporter):
         self.width = tiled_map.width
         self.height = tiled_map.height
 
-        # (HACK): Tile offset is fixed by field offset in the map struct.
-        self.tile_offset = sum(struct.calcsize(fmt) for _, fmt in self.fields)
+        # (HACK): Background offset is fixed by field offset in the map struct.
+        self.background_offset = sum(struct.calcsize(fmt) for _, fmt in self.fields)
 
         # This will be updated as each tile is added
-        self.sprite_offset = self.tile_offset
+        self.sprite_offset = self.background_offset
 
         # (HACK): Not supporting multiple layers
         layer = tiled_map.layers[0]
 
         # (HACK): Not support multiple sprite sheets
-        sprite_sheet = None
+        sprite_sheet = pathlib.Path(tmx_map).parent / pathlib.Path(tiled_map.tilesets[0].source)
 
         # Load all non-zero tile from the layer.
-        for x, y, gid in layer.iter_data():
-            if gid == 0:
+        for layer in tiled_map.layers:
+            if not layer.name.startswith('BG'):
                 continue
 
-            tid = tiled_map.tiledgidmap[gid]
+            background = Background()
+            background.num_tiles = 0
+            background.id = int(layer.name[-1])
+            for x, y, gid in layer.iter_data():
+                if gid == 0:
+                    continue
 
-            # Add the tile and increment the counter tracking
-            index = (y * 32) + x # (HACK): Hardcoded map size and assumes 8x8
-            tile = Tile(tid, version=0, index=index)
-            self.append(tile)
-            self.num_tiles += 1
+                tid = tiled_map.tiledgidmap[gid]
 
-            # Extract the sprite sheet referenced by the tile gid
-            sprite_sheet = pathlib.Path(layer.parent.images[gid][0])
+                # Add the tile and increment the counter tracking
+                index = (y * 0x20) + x # (HACK): Hardcoded map size and assumes 8x8
+                ntid = 2 * (tid - 1)
+                ntid += ((tid - 1) // 8) * 16
+                tile = Tile(ntid, version=0, index=index)
+                background.append(tile)
+                background.num_tiles += 1
+            print(f'num_tiles: {hex(background.num_tiles)}')
 
             # Update the sprite offset for data tracking
-            self.sprite_offset += tile.num_bytes()
+            self.sprite_offset += background.num_bytes()
+            self.num_backgrounds += 1
+
+            # Update the background data for the map
+            self.append(background)
 
         # Update the palette offset for data tracking
         self.palette_offset = self.sprite_offset
@@ -189,8 +204,8 @@ class Map(Exporter):
         sprite = SpriteSheet()
         sprite.magic = bytearray(b'SPR')
         sprite.bpp = 4
-        sprite.width = 8
-        sprite.height = 8
+        sprite.width = 16
+        sprite.height = 16
         sprite.num_rows = 3
         sprite.num_cols = 3
         path = sprite_sheet.with_suffix('.bin')
