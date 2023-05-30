@@ -72,7 +72,7 @@ Input_VBlank:
         and #1
         bne @WaitForJoyReady
 
-    ; Advance the pointer to the first OAM object in the struct
+    ; Advance the pointer to the first joypad input object in the struct
     clc
     lda #input_manager.input_objects
     tax
@@ -123,7 +123,6 @@ Input_Buttons:
     inx
     inx
     @Loop:
-        A8
         stz inputstate, X ; 5 cycles
         lsr A                   ; 2 cycles
         rol inputstate, X ; 7 cycles
@@ -153,7 +152,7 @@ InputManager_Init:
     adc #(MAX_INPUTS * 2)
     sta input_manager.input_queue.end_addr.w 
 
-    ; Set the element size to 2 bytes
+    ; Set the element size to 1 bytes
     lda #1
     sta input_manager.input_queue.element_size.w 
 
