@@ -204,7 +204,7 @@ InputManager_Request:
 
         ; Did we reach the end of the INPUT object space?
         iny
-        cpy #MAX_INPUTS
+        cpy #(MAX_INPUTS + 1)
         beq @Error
 
         ; Otherwise check if the object is allocated
