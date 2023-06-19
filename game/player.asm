@@ -6,6 +6,7 @@ nop
     id               db ; Player ID
     oam_obj_ptr      dw ; Pointer to the requested OAM object
     input_obj_ptr    dw ; Pointer to the requested Input Object
+    char_obj_ptr     dw ; Pointer to the character Object
 .endst
 
 .enum $0000

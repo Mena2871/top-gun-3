@@ -7,12 +7,14 @@
 .include "game/fonts.i"
 .include "game/strings.i"
 .include "game/player.asm"
+.include "game/characters/characters.asm"
 
 .ACCU	16
 .INDEX	16
 
 .struct Game
     frame_counter dw            ; Frame counter (increments every frame)
+    characters instanceof Characters
     player_1 instanceof Player
     player_2 instanceof Player
     game_clock_ptr dw
@@ -117,6 +119,10 @@ Game_Init:
     tyx
     lda #8
     jsr Timer_Init
+
+    ; Initialize Characters
+    ldx #game.characters
+    jsr Characters_Init
 
     ; Initialize the players
     ldx #game.player_1
