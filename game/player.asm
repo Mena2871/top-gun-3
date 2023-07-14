@@ -16,6 +16,8 @@ nop
 Player_Init:
     phy
 
+    sty player.char_obj_ptr, x
+    
     A8
     lda #1
     sta player.id, X
@@ -72,6 +74,8 @@ Player_Input:
     pha
     lda player.input_obj_ptr, X
     pha
+    lda player.char_obj_ptr, X
+    pha
 
     jsr Player_UpBtn
     jsr Player_DnBtn
@@ -81,48 +85,92 @@ Player_Input:
     pla
     pla
     pla
+    pla
     rts
 
 Player_UpBtn:
-    lda 3, s
-    tax
-    ldy inputstate.upbtn, X
-    cpy #1
-    bne @Done
     lda 5, s
     tax
+    lda #0
     A8
-    dec oam_object.y, X
+    lda inputstate.upbtn, X
+    A16
+    tay
+    cpy #1
+    bne @Done
+    lda 3, s
+    adc 1
+    tax
+    lda #0
+    A8
+    lda character_attr.speed, X
+    tay
+    A16
+    lda 7, s
+    tax
+    A8
+    lda oam_object.y, X
+    clc
+    phy
+    sbc 1, S
+    sta oam_object.y, X
+    ply
     A16
     jsr OAM_MarkDirty
     @Done:
         rts
 
 Player_DnBtn:
-    lda 3, s
+    lda 5, s
     tax
     ldy inputstate.dnbtn, X
     cpy #1
     bne @Done
-    lda 5, s
+    lda 3, s
+    adc 1
+    tax
+    lda #0
+    A8
+    lda character_attr.speed, X
+    tay
+    A16
+    lda 7, s
     tax
     A8
-    inc oam_object.y, X
+    lda oam_object.y, X
+    clc
+    phy
+    adc 1, S
+    sta oam_object.y, X
+    ply
     A16
     jsr OAM_MarkDirty
     @Done:
         rts
 
 Player_LftBtn:
-    lda 3, s
+    lda 5, s
     tax
     ldy inputstate.lftbtn, X
     cpy #1
     bne @Done
-    lda 5, s
+    lda 3, s
+    adc 1
+    tax
+    lda #0
+    A8
+    lda character_attr.speed, X
+    tay
+    A16
+    lda 7, s
     tax
     A8
-    dec oam_object.x, X
+    lda oam_object.x, X
+    clc
+    phy
+    sbc 1, S
+    sta oam_object.x, X
+    ply
     A16
     jsr Renderer_TestMoveScreenLeft 
     jsr OAM_MarkDirty
@@ -130,15 +178,28 @@ Player_LftBtn:
         rts
 
 Player_RhtBtn:
-    lda 3, s
+    lda 5, s
     tax
     ldy inputstate.rhtbtn, X
     cpy #1
     bne @Done
-    lda 5, s
+    lda 3, s
+    adc 1
+    tax
+    lda #0
+    A8
+    lda character_attr.speed, X
+    tay
+    A16
+    lda 7, s
     tax
     A8
-    inc oam_object.x, X
+    lda oam_object.x, X
+    clc
+    phy
+    adc 1, S
+    sta oam_object.x, X
+    ply
     A16
     jsr Renderer_TestMoveScreenRight
     jsr OAM_MarkDirty

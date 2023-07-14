@@ -125,9 +125,11 @@ Game_Init:
     jsr Characters_Init
 
     ; Initialize the players
+    ldy #game.characters.character_1
     ldx #game.player_1
     jsr Player_Init
 
+    ldy #game.characters.character_2
     ldx #game.player_2
     jsr Player_Init
 

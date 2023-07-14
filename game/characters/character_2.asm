@@ -1,8 +1,4 @@
-; .define SPEED 2
-
 .section "Character_2" BANK 0 SLOT "ROM"
-
-nop
 
 .struct Character_2
     id         db ; Character ID
@@ -20,7 +16,7 @@ Character_2_Init:
     lda #2
     sta character_2.id, X
 
-    lda #SPEED
+    lda #1
     sta character_2.character_attr.speed, X
     A16
 
