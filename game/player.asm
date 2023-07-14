@@ -77,6 +77,7 @@ Player_Input:
     lda player.char_obj_ptr, X
     pha
 
+    ; Check buttons
     jsr Player_UpBtn
     jsr Player_DnBtn
     jsr Player_LftBtn
@@ -89,8 +90,11 @@ Player_Input:
     rts
 
 Player_UpBtn:
+    ; Load Input State Pointer
     lda 5, s
     tax
+
+    ; Load Button State
     lda #0
     A8
     lda inputstate.upbtn, X
@@ -101,6 +105,8 @@ Player_UpBtn:
     lda 3, s
     adc 1
     tax
+
+    ; Load Speed Attr
     lda #0
     A8
     lda character_attr.speed, X
@@ -109,26 +115,41 @@ Player_UpBtn:
     lda 7, s
     tax
     A8
+
+    ; Load OAM Y location
     lda oam_object.y, X
     clc
     phy
+
+    ; Subtract Speed Value from current Value
     sbc 1, S
     sta oam_object.y, X
     ply
     A16
+
+    ; Update OAM
     jsr OAM_MarkDirty
     @Done:
         rts
 
 Player_DnBtn:
+    ; Load Input State Pointer
     lda 5, s
     tax
-    ldy inputstate.dnbtn, X
+
+    ; Load Button State
+    lda #0
+    A8
+    lda inputstate.dnbtn, X
+    A16
+    tay
     cpy #1
     bne @Done
     lda 3, s
     adc 1
     tax
+
+    ; Load Speed Attr
     lda #0
     A8
     lda character_attr.speed, X
@@ -137,26 +158,41 @@ Player_DnBtn:
     lda 7, s
     tax
     A8
+
+    ; Load OAM Y location
     lda oam_object.y, X
     clc
     phy
+
+    ; Add Speed Value from current Value
     adc 1, S
     sta oam_object.y, X
     ply
     A16
+
+    ; Update OAM
     jsr OAM_MarkDirty
     @Done:
         rts
 
 Player_LftBtn:
+    ; Load Input State Pointer
     lda 5, s
     tax
-    ldy inputstate.lftbtn, X
+
+    ; Load Button State
+    lda #0
+    A8
+    lda inputstate.lftbtn, X
+    A16
+    tay
     cpy #1
     bne @Done
     lda 3, s
     adc 1
     tax
+
+    ; Load Speed Attr
     lda #0
     A8
     lda character_attr.speed, X
@@ -165,9 +201,13 @@ Player_LftBtn:
     lda 7, s
     tax
     A8
+
+    ; Load OAM X location
     lda oam_object.x, X
     clc
     phy
+
+    ; Subtract Speed Value from current Value
     sbc 1, S
     sta oam_object.x, X
     ply
@@ -178,14 +218,23 @@ Player_LftBtn:
         rts
 
 Player_RhtBtn:
+    ; Load Input State Pointer
     lda 5, s
     tax
-    ldy inputstate.rhtbtn, X
+
+    ; Load Button State
+    lda #0
+    A8
+    lda inputstate.rhtbtn, X
+    A16
+    tay
     cpy #1
     bne @Done
     lda 3, s
     adc 1
     tax
+
+    ; Load Speed Attr
     lda #0
     A8
     lda character_attr.speed, X
@@ -194,9 +243,13 @@ Player_RhtBtn:
     lda 7, s
     tax
     A8
+
+    ; Load OAM X location
     lda oam_object.x, X
     clc
     phy
+
+    ; Add Speed Value from current Value
     adc 1, S
     sta oam_object.x, X
     ply
