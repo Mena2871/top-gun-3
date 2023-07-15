@@ -69,14 +69,6 @@ Player_Frame:
 Player_Input:
     pha
 
-    ; Load pointer to OAM object
-    lda player.oam_obj_ptr, X
-    pha
-    lda player.input_obj_ptr, X
-    pha
-    lda player.char_obj_ptr, X
-    pha
-
     ; Check buttons
     jsr Player_UpBtn
     jsr Player_DnBtn
@@ -84,179 +76,172 @@ Player_Input:
     jsr Player_RhtBtn
 
     pla
-    pla
-    pla
-    pla
     rts
 
 Player_UpBtn:
+    phx
+
     ; Load Input State Pointer
-    lda 5, s
+    lda player.input_obj_ptr, X
     tax
 
-    ; Load Button State
-    lda #0
-    A8
+    ; Check if Up Button is pressed
     lda inputstate.upbtn, X
-    A16
-    tay
-    cpy #1
+    cmp #1
     bne @Done
-    lda 3, s
+
+    ; Restore X pointing to the player object
+    lda 1, S
+    tax
+
+    ; Now use X and Y index registers for oam object and char object pointers
+    lda player.char_obj_ptr, X
     adc 1
-    tax
-
-    ; Load Speed Attr
-    lda #0
-    A8
-    lda character_attr.speed, X
     tay
-    A16
-    lda 7, s
+
+    ; OAM object pointer is setup for any OAM calls now
+    lda player.oam_obj_ptr, X
     tax
+
+    ; Update the OAM object location by subtracting the speed from it
+    ; This keeps our 8-bit operations all isolated
     A8
-
-    ; Load OAM Y location
+    sec
     lda oam_object.y, X
-    clc
-    phy
-
-    ; Subtract Speed Value from current Value
-    sbc 1, S
+    sbc character_attr.speed, Y
     sta oam_object.y, X
-    ply
     A16
 
-    ; Update OAM
+    ; Update OAM (X pointer is already set)
     jsr OAM_MarkDirty
+
     @Done:
+        plx
         rts
 
 Player_DnBtn:
+    phx
+
     ; Load Input State Pointer
-    lda 5, s
+    lda player.input_obj_ptr, X
     tax
 
-    ; Load Button State
-    lda #0
-    A8
+    ; Check if Down Button is pressed
     lda inputstate.dnbtn, X
-    A16
-    tay
-    cpy #1
+    cmp #1
     bne @Done
-    lda 3, s
+
+    ; Restore X pointing to the player object
+    lda 1, S
+    tax
+
+    ; Now use X and Y index registers for oam object and char object pointers
+    lda player.char_obj_ptr, X
     adc 1
-    tax
-
-    ; Load Speed Attr
-    lda #0
-    A8
-    lda character_attr.speed, X
     tay
-    A16
-    lda 7, s
+
+    ; OAM object pointer is setup for any OAM calls now
+    lda player.oam_obj_ptr, X
     tax
+
+    ; Update the OAM object location by subtracting the speed from it
+    ; This keeps our 8-bit operations all isolated
     A8
-
-    ; Load OAM Y location
+    sec
     lda oam_object.y, X
-    clc
-    phy
-
-    ; Add Speed Value from current Value
-    adc 1, S
+    adc character_attr.speed, Y
     sta oam_object.y, X
-    ply
     A16
 
-    ; Update OAM
+    ; Update OAM (X pointer is already set)
     jsr OAM_MarkDirty
+
     @Done:
+        plx
         rts
 
 Player_LftBtn:
+    phx
+
     ; Load Input State Pointer
-    lda 5, s
+    lda player.input_obj_ptr, X
     tax
 
-    ; Load Button State
-    lda #0
-    A8
+    ; Check if Left Button is pressed
     lda inputstate.lftbtn, X
-    A16
-    tay
-    cpy #1
+    cmp #1
     bne @Done
-    lda 3, s
+
+    ; Restore X pointing to the player object
+    lda 1, S
+    tax
+
+    ; Now use X and Y index registers for oam object and char object pointers
+    lda player.char_obj_ptr, X
     adc 1
-    tax
-
-    ; Load Speed Attr
-    lda #0
-    A8
-    lda character_attr.speed, X
     tay
-    A16
-    lda 7, s
+
+    ; OAM object pointer is setup for any OAM calls now
+    lda player.oam_obj_ptr, X
     tax
+
+    ; Update the OAM object location by subtracting the speed from it
+    ; This keeps our 8-bit operations all isolated
     A8
-
-    ; Load OAM X location
+    sec
     lda oam_object.x, X
-    clc
-    phy
-
-    ; Subtract Speed Value from current Value
-    sbc 1, S
+    sbc character_attr.speed, Y
     sta oam_object.x, X
-    ply
     A16
-    jsr Renderer_TestMoveScreenLeft 
+
+    ; Update OAM (X pointer is already set)
+    jsr Renderer_TestMoveScreenLeft
     jsr OAM_MarkDirty
+
     @Done:
+        plx
         rts
 
 Player_RhtBtn:
+    phx
+
     ; Load Input State Pointer
-    lda 5, s
+    lda player.input_obj_ptr, X
     tax
 
-    ; Load Button State
-    lda #0
-    A8
+    ; Check if Right Button is pressed
     lda inputstate.rhtbtn, X
-    A16
-    tay
-    cpy #1
+    cmp #1
     bne @Done
-    lda 3, s
+
+    ; Restore X pointing to the player object
+    lda 1, S
+    tax
+
+    ; Now use X and Y index registers for oam object and char object pointers
+    lda player.char_obj_ptr, X
     adc 1
-    tax
-
-    ; Load Speed Attr
-    lda #0
-    A8
-    lda character_attr.speed, X
     tay
-    A16
-    lda 7, s
+
+    ; OAM object pointer is setup for any OAM calls now
+    lda player.oam_obj_ptr, X
     tax
+
+    ; Update the OAM object location by subtracting the speed from it
+    ; This keeps our 8-bit operations all isolated
     A8
-
-    ; Load OAM X location
+    sec
     lda oam_object.x, X
-    clc
-    phy
-
-    ; Add Speed Value from current Value
-    adc 1, S
+    adc character_attr.speed, Y
     sta oam_object.x, X
-    ply
     A16
+
+    ; Update OAM (X pointer is already set)
     jsr Renderer_TestMoveScreenRight
     jsr OAM_MarkDirty
+
     @Done:
+        plx
         rts
 
 .ends

@@ -68,14 +68,6 @@
     rep #%00100000
 .endm
 
-.macro XY8
-    sep #%00010000
-.endm
-
-.macro XY16
-    rep #%00010000
-.endm
-
 ; HACK: Hack to set the DB register to 1. You should set phb/plb in the routine.
 .macro DB1
     A16
