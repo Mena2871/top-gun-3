@@ -87,8 +87,8 @@ Player_UpBtn:
 
     ; Check if Up Button is pressed
     lda inputstate.upbtn, X
-    cmp #1
-    bne @Done
+    and #1
+    beq @Done
 
     ; Restore X pointing to the player object
     lda 1, S
@@ -96,6 +96,7 @@ Player_UpBtn:
 
     ; Now use X and Y index registers for oam object and char object pointers
     lda player.char_obj_ptr, X
+    sec
     adc 1
     tay
 
@@ -128,8 +129,8 @@ Player_DnBtn:
 
     ; Check if Down Button is pressed
     lda inputstate.dnbtn, X
-    cmp #1
-    bne @Done
+    and #1
+    beq @Done
 
     ; Restore X pointing to the player object
     lda 1, S
@@ -137,6 +138,7 @@ Player_DnBtn:
 
     ; Now use X and Y index registers for oam object and char object pointers
     lda player.char_obj_ptr, X
+    sec
     adc 1
     tay
 
@@ -169,8 +171,8 @@ Player_LftBtn:
 
     ; Check if Left Button is pressed
     lda inputstate.lftbtn, X
-    cmp #1
-    bne @Done
+    and #1
+    beq @Done
 
     ; Restore X pointing to the player object
     lda 1, S
@@ -178,6 +180,7 @@ Player_LftBtn:
 
     ; Now use X and Y index registers for oam object and char object pointers
     lda player.char_obj_ptr, X
+    sec
     adc 1
     tay
 
@@ -211,8 +214,8 @@ Player_RhtBtn:
 
     ; Check if Right Button is pressed
     lda inputstate.rhtbtn, X
-    cmp #1
-    bne @Done
+    and #1
+    beq @Done
 
     ; Restore X pointing to the player object
     lda 1, S
@@ -220,6 +223,7 @@ Player_RhtBtn:
 
     ; Now use X and Y index registers for oam object and char object pointers
     lda player.char_obj_ptr, X
+    sec
     adc 1
     tay
 
