@@ -14,6 +14,7 @@
 .include "common/lib/queue.i"
 .include "common/lib/stack.i"
 .include "game/game.asm"
+.include "engine/debug.asm"
 
 .define STACK $1FFF
 
@@ -89,8 +90,10 @@ Main:
 
     ; Main game loop
     @Main_Loop:
+        jsr Debug_FrameStart
         jsr Engine_Frame
         jsr Game_Frame  ; Expects X to be the "this" pointer
+        jsr Debug_FrameEnd
         bra @Main_Loop  ; Loop forever
 
 ;
@@ -113,6 +116,9 @@ Main_VBlank:
     lda #0
     tcd
 
+    ; Let the debugger know we're starting
+    jsr Debug_VBlankStart
+
     ; read NMI status, acknowledge NMI, and turn off screen
     A8
     lda RDNMI
@@ -123,12 +129,15 @@ Main_VBlank:
     ; handling a game frame, then we can do the rendering and input
     ; and otherwise skip this ISR.
     A16
-    jsr Game_VBlank ; Expects X to be the "this" pointer
+    jsr Game_VBlank
 
     ; Re-enable the screen
     A8
     lda #$0F
     sta INIDISP
+
+    ; Let the debugger know we're done
+    jsr Debug_VBlankEnd
 
     ; Restore CPU registers
     A16
