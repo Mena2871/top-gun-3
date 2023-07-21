@@ -58,11 +58,13 @@ Memset:
     phy             ; Save the end address of the memory
     pha             ; Save the value to write
 
+    A8
     @Loop:
         sta $0, X
         inx
         dey
         bne @Loop
+    A16
 
     pla
     ply
