@@ -46,15 +46,15 @@
 .FASTROM
 
 .ROMBANKMAP
-    BANKSTOTAL 3
+    BANKSTOTAL 4
     BANKSIZE $8000
-    BANKS 3
+    BANKS 4
 .ENDRO
 
 .MEMORYMAP
     DEFAULTSLOT 1
     ; The first 32 pages of work RAM is mirrored across $00 to $40
-    SLOT 0    START $0000 SIZE $1000 "WRAM"
+    SLOT 0    START $0000 SIZE $1FFF "WRAM"
     SLOT 1    START $8000 SIZE $8000 "ROM"
 .ENDME
 
