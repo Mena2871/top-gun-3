@@ -381,9 +381,9 @@ Map_LoadPalettes:
 ; Read all backgrounds from the map into vram
 ;
 Map_LoadBackgrounds:
-    pha
     phy
     phx
+    pha
 
     ; Put the number of tiles on the stack
     lda map.num_backgrounds, X
