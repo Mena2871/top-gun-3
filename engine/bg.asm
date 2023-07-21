@@ -1,28 +1,27 @@
+; Tilemaps are 2KB blocks of VRAM
+.define BG1_TILEMAP_VRAM $1000
+.define BG2_TILEMAP_VRAM $1400
+.define BG3_TILEMAP_VRAM $1800
 
-.define BG1_TILEMAP_VRAM $0000
-.define BG2_TILEMAP_VRAM $0400
-.define BG3_TILEMAP_VRAM $0800
-
-; Remember, thse are 16-bit words, so the actual VRAM byte address is 2x the value.
-.define BG1_CHAR_VRAM    $2000
-.define BG2_CHAR_VRAM    $2000
-.define BG3_CHAR_VRAM    $6000
+; Remember, these are 16-bit words
+.define BG1_CHAR_VRAM    $3000
+.define BG2_CHAR_VRAM    $3000
+.define BG3_CHAR_VRAM    $5000
 .define BG4_CHAR_VRAM    $5000
 
-;
-; x / 11111 = 32 * 3200 / 7C00
 ; 5 bits are used to address the 64K of VRAM.
-; The resolution of the tilemap is $0400 in VRAM.
-; 
 .define BG_SIZE_32_32 0
 .define BG_SIZE_64_32 1
 .define BG_SIZE_32_64 2
 .define BG_SIZE_64_64 3
 
-.function BG_SC(vram, size) lobyte((($1F * vram / $7C00) << 2) | (size & $3))
-.function BG_NBA(vram) lobyte(($7 * vram / $7000) & $F)
-.function BG_12NBA(bg1, bg2) lobyte((BG_NBA(bg2) << 4) | BG_NBA(bg1))
-.function BG_34NBA(bg3, bg4) lobyte((BG_NBA(bg4) << 4) | BG_NBA(bg3))
+; Per the documentation BGxSC is aaaaaaxy where 'a' is the VRAM address >> 10
+.function BG_SC(vram, size) (((vram >> 10) << 2)) | (size & $3)
+
+; Per the document BGxNBA is aaaabbbb where a and b are the VRAM address >> 12
+.function BG_NBA(vram) vram >> 12
+.function BG_12NBA(bg1, bg2) (BG_NBA(bg2) << 4) | BG_NBA(bg1)
+.function BG_34NBA(bg3, bg4) (BG_NBA(bg4) << 4) | BG_NBA(bg3)
 
 .struct BGInfo
     next_char_vram dw ; Next available character VRAM address

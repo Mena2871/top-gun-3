@@ -73,7 +73,7 @@
 
 ;  (intentionally aligned with BG1 for testing)
 ; Remember these are 16-bit word addresses
-.define OAM_DEFAULT_OBJSEL %00000001  ; 8x8/16x16 Page 0 @ $2000, Page 1 @ $3000
+.define OAM_DEFAULT_OBJSEL %00100011  ; 8x8/16x16 Page 0 @ $6000, Page 1 @ $7000
 
 ;
 ; OAM Object Properties
