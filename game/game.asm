@@ -20,6 +20,7 @@
     game_clock_ptr dw
     test_ui_ptr dw              ; Pointer to the requested test UI component
     dynamic_text_buffer ds 8    ; Buffer for dynamic text
+    test_sprite_ptr dw          ; Pointer to the requested test sprite
 .endst
 
 .ramsection "GameRAM" appendto "RAM"
@@ -31,8 +32,6 @@ nop ; This is here to prevent the compiler from optimizing the label away
 
 ;
 ; Main game loop
-; Arguments:
-; - X: Pointer to Game struct
 ;
 Game_Frame:
     pha
@@ -86,13 +85,11 @@ Game_Frame:
 
 ;
 ; Initialize the game
-; Arguments:
-; - X: Pointer to Game struct
 ;
 Game_Init:
     pha                             ; Save A register
     phy                             ; Save Y register
-    phx                             ; Save X register (this pointer)
+    phx                             ; Save X register
 
     stz game.frame_counter.w        ; Zero frame counter
     jsr Engine_Init
@@ -101,6 +98,15 @@ Game_Init:
     ldy #_sizeof_Game.dynamic_text_buffer
     lda #0
     jsr Memset
+
+    ; Load a demo sprite
+    jsr SpriteManager_Request
+    lda #Sprite_Plane@Bank
+    ldx #Sprite_Plane@Data
+    jsr Sprite_Load 
+
+    ; Save pointer to the sprite
+    sty game.test_sprite_ptr.w
 
     ; Load a demo map
     lda #Map_Skyscraper@Bank
@@ -117,7 +123,7 @@ Game_Init:
     jsr TimerManager_Request
     sty game.game_clock_ptr.w
     tyx
-    lda #8
+    lda #10
     jsr Timer_Init
 
     ; Initialize Characters

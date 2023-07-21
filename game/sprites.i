@@ -1,8 +1,6 @@
-.section "Sprites" bank 1 slot "ROM"
-
+.section "Sprites" bank 3 slot "ROM"
 nop
-
-;SpriteData: .incbin "resources/sprites/TopGun.bin"
-;ColorData:  .incbin "resources/sprites/TopGun.pal"
-
+;.include "resources/sprites/16x16/16x16.i"
+;.include "resources/sprites/8x8/16x16.i"
+.include "resources/sprites/plane/plane.i"
 .ends

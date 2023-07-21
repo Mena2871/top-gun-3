@@ -68,6 +68,7 @@
 ; Used to manage loading and manipulating the current map
 ; 
 .struct MapManager
+    cgram_index    db   ; 8-bit index of the palette in cgram
     map_bank       db   ; 8-bit bank number of the map
     map_ptr        dw   ; 16-bit pointer to the map struct
 .endst
@@ -331,16 +332,35 @@ Map_LoadSprites
 Map_LoadPalettes:
     A16
     phx
+    phy
+
+    ; Request a palette from the CGRAM manager
+    ldx #cgram_bg_manager
+    jsr CGRAMManager_Request
+    tya
+
+    ; Store the palette index in the map manager
+    A8
+    sta map_manager.cgram_index
+    A16
+
+    ; Convert the palette index to a CGRAM address
+    ; Expects the Y register to be the palette index
+    jsr CGRAM_Index
+
+    ; Bounce the stack
+    ply
+    plx
+    phy
+    phx
 
     ; Transfer the size of the palette into the X register
     ; as a counter for reading data
     ;lda palette.size, X
-    lda #$20
-    tay
 
     A8
-    lda #$00
-    sta CGADD                   ; Set CGADD to 0x80
+    sta CGADD                   ; Set CGADD to requested bg cgram index
+    ldy #$20
     @BGCGRAMLoop:               ; Loop through all X bytes of color data
         lda palette.data, X     ; Low byte color data
         sta CGDATA              ; Store data to CGRAM
@@ -353,34 +373,15 @@ Map_LoadPalettes:
         bne @BGCGRAMLoop        ; Loop if not
 
     A16
+    ply
     plx
-    phx
-
-    A8
-    lda #$20
-    tay
-    lda #$80
-    sta CGADD                   ; Set CGADD to 0x80
-    @ObjCGRAMLoop:              ; Loop through all X bytes of color data
-        lda palette.data.w, X   ; Low byte color data
-        sta CGDATA              ; Store data to CGRAM
-        inx                     ; Increment data offset
-        dey                     ; Decrement counter
-        lda palette.data.w, X   ; High byte color data
-        sta CGDATA              ; Store data to CGRAM
-        inx                     ; Increment data offset
-        dey                     ; Decrement counter
-        bne @ObjCGRAMLoop       ; Loop if not
-
-    A16
-    plx
-
     rts
 
 ;
 ; Read all backgrounds from the map into vram
 ;
 Map_LoadBackgrounds:
+    pha
     phy
     phx
 

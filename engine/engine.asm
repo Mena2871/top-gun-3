@@ -6,7 +6,9 @@
 .include "engine/input.asm"
 .include "engine/map.asm"
 .include "engine/oam.asm"
+.include "engine/sprite.asm"
 .include "engine/timer.asm"
+.include "engine/cgram.asm"
 .include "engine/renderer.asm"
 
 .struct Engine
@@ -28,8 +30,10 @@ Engine_Init:
     jsr SNES_Init
     jsr OAMManager_Init
     jsr BGManager_Init
+    jsr CGRAMManager_Init
     jsr TimerManager_Init
     jsr MapManager_Init
+    jsr SpriteManager_Init
     jsr FontManager_Init
     jsr InputManager_Init
     jsr Renderer_Init
@@ -45,6 +49,7 @@ Engine_Init:
 Engine_Frame:
     jsr TimerManager_Frame
     jsr FontManager_Frame
+    jsr SpriteManager_Frame
     rts
 
 Engine_VBlank:
