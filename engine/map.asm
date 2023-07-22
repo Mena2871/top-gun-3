@@ -351,8 +351,8 @@ Map_LoadPalettes:
     ; Bounce the stack
     ply
     plx
-    phy
     phx
+    phy
 
     ; Transfer the size of the palette into the X register
     ; as a counter for reading data
