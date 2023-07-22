@@ -123,10 +123,10 @@ Renderer_TestMoveScreenLeft:
 
 Renderer_TestMoveScreenRight:
     pha
-    lda #16
+    lda #8
     adc renderer.bg_screen.1.h_offset.w
     sta renderer.bg_screen.1.h_offset.w
-    lda #8
+    lda #2
     adc renderer.bg_screen.2.h_offset.w
     sta renderer.bg_screen.2.h_offset.w
     pla
