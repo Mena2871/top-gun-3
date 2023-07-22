@@ -607,7 +607,6 @@ OAMManager_Init:
         sta oam_object.index, X ; Set the index of the object to its position in the array
 
         ; Compute word offset into the OAM low table (16 bits per object)
-        tya 
         asl
         sta oam_object.low_table, X
 
