@@ -198,13 +198,15 @@
     ptr        dw      ; 16-bit pointer to the sprite data
     vram       dw      ; 16-bit pointer to the sprite data in VRAM
     tag        dw      ; 16-bit pointer to the active tag
+    tag_idx    dw      ; 16-bit index of the active tag
     oams       ds  64  ; Array of 32 16-bit OAM pointers
     oam_count  dw      ; Number of active OAMs
     frame      dw      ; 16-bit pointer to the active frame
     frame_idx  dw      ; 16-bit index of the active frame
     tiles      ds  64  ; Array of 32 16-bit tile pointers
     tile_count dw      ; Number of tiles in the active frame
-    cgram_index db     ; 8-bit index of the palette in CGRAM
+    cgram_idx  db      ; 8-bit index of the palette in CGRAM
+    priority   db      ; Background priority (0 to 3)
 .endst
 .enum $0000
     sprite_desc instanceof SpriteDescriptor
@@ -380,6 +382,68 @@ SpriteManager_Release:
 
     rts
 
+
+;
+; Copy a sprite object from one to another without setting tag or frame
+; Expects X to be the source pointer
+; Expects Y to be the destination pointer
+;
+Sprite_Copy:
+    pha
+    phx
+    phy
+
+    A8
+    lda sprite_desc.x, X
+    sta sprite_desc.x, Y
+
+    lda sprite_desc.y, X
+    sta sprite_desc.y, Y
+
+    lda sprite_desc.bank, X
+    sta sprite_desc.bank, Y
+
+    lda sprite_desc.cgram_idx, X
+    sta sprite_desc.cgram_idx, Y
+
+    lda sprite_desc.priority, X
+    sta sprite_desc.priority, Y
+
+    A16
+    lda sprite_desc.ptr, X
+    sta sprite_desc.ptr, Y
+
+    lda sprite_desc.vram, X
+    sta sprite_desc.vram, Y
+
+    ply
+    plx
+    pla
+    rts
+
+;
+; Copy all attributes of a sprite object from one to another
+; Expects X to be the source pointer
+; Expects Y to be the destination pointer
+;
+Sprite_DeepCopy:
+    pha
+    phx
+    phy
+
+    jsr Sprite_Copy
+
+    lda sprite_desc.tag_idx.w, X
+    jsr Sprite_SetTag
+
+    lda sprite_desc.frame_idx, X
+    jsr Sprite_SetFrame
+
+    ply
+    plx
+    pla
+    rts
+
 ;
 ; Expects Y register to be the pointer to the sprite descriptor
 ; Expects X register to be the 16-bit sprite pointer
@@ -415,7 +479,7 @@ Sprite_Load:
 
     ; Store the palette index in the map manager
     A8
-    sta sprite_desc.cgram_index.w, Y
+    sta sprite_desc.cgram_idx.w, Y
     A16
 
     ; Set the data bank register to the correct bank
@@ -494,7 +558,7 @@ Sprite_LoadPalette:
 
     ; Store the palette index in the map manager
     A8
-    lda sprite_desc.cgram_index, Y
+    lda sprite_desc.cgram_idx, Y
     tay
     A16
 
@@ -584,6 +648,9 @@ Sprite_SetTag:
     pha
     phx
     phy
+
+    ; Store the raw tag index for future lookups (or copy)
+    sta sprite_desc.tag_idx.w, Y
 
     ; Setup the X register pointer to be the correct 16-bit address
     ; and then save the pointer for the tag for future lookups
@@ -737,6 +804,9 @@ Sprite_SetFrame:
     pha
     phy
 
+    ; Store the raw frame index 
+    sta sprite_desc.frame_idx.w, Y
+
     ; Save the data bank register because we're going to bounce it
     phb
 
@@ -795,11 +865,8 @@ Sprite_SetFrame:
         ply
         sta sprite_desc.frame.w, Y
 
-        ; Set the frame index
-        pla
-        sta sprite_desc.frame_idx.w, Y
-
         ; Preserve order of the stack to make it easier to debug
+        pla
         pha
         phy
 
@@ -969,6 +1036,7 @@ Sprite_SetFrame:
 ; Will mark the object as dirty and push it onto the queue
 ;
 Sprite_MarkDirty:
+    A16
     pha
     phx
     phy

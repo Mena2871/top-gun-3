@@ -97,11 +97,13 @@ OAMObject_Init:
     stz oam_object.allocated, X
     stz oam_object.visible, X
     stz oam_object.size, X
-    stz oam_object.x, X
+    lda #255
+    sta oam_object.x, X
     stz oam_object.y, X
     stz oam_object.vram, X
     stz oam_object.palette, X
-    stz oam_object.priority, X
+    lda #2
+    sta oam_object.priority, X
     stz oam_object.flip_h, X
     stz oam_object.flip_v, X
     A16
@@ -625,6 +627,8 @@ OAMManager_Init:
         sta oam_object.bitmask_xpos, X
         A16
 
+        jsr OAMObject_Write
+
         pla
         clc
         adc #_sizeof_OAMObject   ; Advance the pointer
@@ -761,6 +765,7 @@ OAMManager_Release:
 
     ; Mark the OAM object as not allocated. stz only works with X register.
     tyx
+    jsr OAMObject_Init
     stz oam_object.allocated, X
 
     A16

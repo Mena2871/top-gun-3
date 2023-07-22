@@ -20,7 +20,10 @@
     game_clock_ptr dw
     test_ui_ptr dw              ; Pointer to the requested test UI component
     dynamic_text_buffer ds 8    ; Buffer for dynamic text
-    test_sprite_ptr dw          ; Pointer to the requested test sprite
+    test_sprite_ptr1 dw          ; Pointer to the requested test sprite
+    test_sprite_ptr2 dw          ; Pointer to the requested test sprite
+    test_sprite_ptr3 dw          ; Pointer to the requested test sprite
+    test_sprite_ptr4 dw          ; Pointer to the requested test sprite
 .endst
 
 .ramsection "GameRAM" appendto "RAM"
@@ -43,6 +46,25 @@ Game_Frame:
     cpy #1
     bne @Done
 
+    ; Move the sprite across the screen
+    A8
+    ldx game.test_sprite_ptr1.w
+    inc sprite_desc.x, X
+    jsr Sprite_MarkDirty
+
+    ldx game.test_sprite_ptr2.w
+    inc sprite_desc.x, X
+    jsr Sprite_MarkDirty
+
+    ldx game.test_sprite_ptr3.w
+    inc sprite_desc.x, X
+    jsr Sprite_MarkDirty
+
+    ldx game.test_sprite_ptr4.w
+    inc sprite_desc.x, X
+    jsr Sprite_MarkDirty
+
+    A16
     inc game.frame_counter.w        ; Increment frame counter
 
     ldx #game.player_1
@@ -106,7 +128,71 @@ Game_Init:
     jsr Sprite_Load 
 
     ; Save pointer to the sprite
-    sty game.test_sprite_ptr.w
+    sty game.test_sprite_ptr1.w
+
+    A8
+    lda #50
+    sta sprite_desc.x, Y
+
+    lda #10
+    sta sprite_desc.y, Y
+    A16
+
+    ; Set the tag of the sprite to the Forward animation
+    lda #Sprite_Plane@Tag@Forward
+    jsr Sprite_SetTag
+
+    ; Set the frame of the sprite to 0
+    lda #0
+    jsr Sprite_SetFrame
+
+    ; Request another sprite descriptor
+    jsr SpriteManager_Request
+    sty game.test_sprite_ptr2.w
+
+    ; Copy from X -> Y
+    ldx game.test_sprite_ptr1.w
+    jsr Sprite_DeepCopy
+
+    A8
+    lda #15
+    sta sprite_desc.x, Y
+
+    lda #50
+    sta sprite_desc.y, Y
+    A16
+
+    ; Request another sprite descriptor
+    jsr SpriteManager_Request
+    sty game.test_sprite_ptr3.w
+
+    ; Copy from X -> Y
+    ldx game.test_sprite_ptr1.w
+    jsr Sprite_DeepCopy
+
+    A8
+    lda #15
+    sta sprite_desc.x, Y
+
+    lda #100
+    sta sprite_desc.y, Y
+    A16
+
+    ; Request another sprite descriptor
+    jsr SpriteManager_Request
+    sty game.test_sprite_ptr4.w
+
+    ; Copy from X -> Y
+    ldx game.test_sprite_ptr1.w
+    jsr Sprite_DeepCopy
+
+    A8
+    lda #50
+    sta sprite_desc.x, Y
+
+    lda #150
+    sta sprite_desc.y, Y
+    A16
 
     ; Load a demo map
     lda #Map_Skyscraper@Bank
@@ -123,7 +209,7 @@ Game_Init:
     jsr TimerManager_Request
     sty game.game_clock_ptr.w
     tyx
-    lda #10
+    lda #8
     jsr Timer_Init
 
     ; Initialize Characters
