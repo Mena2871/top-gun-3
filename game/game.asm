@@ -129,7 +129,7 @@ Game_Init:
     A16
 
     ; Set the tag of the sprite to the Forward animation
-    lda #Sprite_Plane@Tag@Forward
+    lda #Sprite_Plane@Tag@Forward_Afterburner
     jsr Sprite_SetTag
 
     ; Set the frame of the sprite to 0
