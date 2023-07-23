@@ -24,6 +24,7 @@
     test_sprite_ptr2 dw          ; Pointer to the requested test sprite
     test_sprite_ptr3 dw          ; Pointer to the requested test sprite
     test_sprite_ptr4 dw          ; Pointer to the requested test sprite
+    test_sprite_ptr5 dw          ; Pointer to the requested test sprite
 .endst
 
 .ramsection "GameRAM" appendto "RAM"
@@ -61,6 +62,10 @@ Game_Frame:
     jsr Sprite_MarkDirty
 
     ldx game.test_sprite_ptr4.w
+    inc sprite_desc.x, X
+    jsr Sprite_MarkDirty
+
+    ldx game.test_sprite_ptr5.w
     inc sprite_desc.x, X
     jsr Sprite_MarkDirty
 
@@ -139,7 +144,7 @@ Game_Init:
     A16
 
     ; Set the tag of the sprite to the Forward animation
-    lda #Sprite_Plane@Tag@Forward
+    lda #Sprite_Plane@Tag@Forward_Afterburner
     jsr Sprite_SetTag
 
     ; Set the frame of the sprite to 0
@@ -191,6 +196,22 @@ Game_Init:
     sta sprite_desc.x, Y
 
     lda #150
+    sta sprite_desc.y, Y
+    A16
+
+    ; Request another sprite descriptor
+    jsr SpriteManager_Request
+    sty game.test_sprite_ptr5.w
+
+    ; Copy from X -> Y
+    ldx game.test_sprite_ptr1.w
+    jsr Sprite_DeepCopy
+
+    A8
+    lda #100
+    sta sprite_desc.x, Y
+
+    lda #75
     sta sprite_desc.y, Y
     A16
 

@@ -1,7 +1,7 @@
 ; Where in VRAM we will store our spritesheets
 .define SPRITE_CHAR_VRAM $6000
 .define SPRITE_SIZE $2000
-.define MAX_SPRITE_OBJECTS 4
+.define MAX_SPRITE_OBJECTS 8
 
 ;
 ; A Tile is a single SNES object that makes up a larger sprite.
@@ -971,6 +971,9 @@ Sprite_SetFrame:
 
                 lda tile_hdr.prog_ram_addr.w, X
                 sta oam_object.vram
+
+                lda #1
+                sta oam_object.visible
                 A16
 
                 ; Restore D register to go back to previous stack state
