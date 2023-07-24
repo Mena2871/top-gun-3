@@ -44,6 +44,7 @@
     x            db  ; This is the horizontal position of the sprite
     y            db  ; This is the vertical position of the sprite
     vram         db  ;
+    page         db  ;
     palette      db  ; Color palette to use (0-7)
     priority     db  ; 0 = highest, 3 = lowest
     flip_h       db  ; 0 = normal, 1 = flip
@@ -89,13 +90,10 @@ OAM_XPosTable:
 OAMObject_Init:
     ; Zeroize the object
     A8
-    stz oam_object.low_table, X
-    stz oam_object.high_table, X
-    stz oam_object.bitmask_size, X
-    stz oam_object.bitmask_xpos, X
     stz oam_object.allocated, X
     stz oam_object.visible, X
     stz oam_object.size, X
+    stz oam_object.page, X
     lda #0
     sta oam_object.x, X
     stz oam_object.y, X
@@ -295,48 +293,48 @@ OAM_ComputeLowTable:
     sta oam_manager.oam_table.low.w, Y
     iny
 
-    ; Put the flip into the right place
-    ; Rotate the the bits to position 7
-    lda oam_object.flip_v, X
-    ror ; Rotate puts into carry
-    ror ; And then put in position 7
-    pha
-
-    ; Put the flip into the right place
-    ; Rotate the the bits to position 6
-    lda oam_object.flip_h, X
-    ror ; Rotate puts into carry
-    ror ; And then put into position 6
-    ror ;
-
-    pha
-
-    ; Put priority into bits 5, 4
-    lda oam_object.priority, X
-    rol ; Put next to the color bits
-    rol
-    rol
-    rol
+    lda oam_object.page, X
     pha
 
     ; Put palette into bits 3, 2, 1
     lda oam_object.palette, X
-    rol
+    asl ; Put into position 1
+    ora 1, S
+    sta 1, S
 
-    ; Or in the priority bits
-    eor 1, S
+    ; Put priority into bits 5, 4
+    clc
+    lda oam_object.priority, X
+    asl 
+    asl
+    asl
+    asl
+    ora 1, S
+    sta 1, S
 
-    ; Or in the flip bits
-    eor 2, S ; Flip H
-    eor 3, S ; Flip V
+    ; Put the flip into the right place
+    ; Rotate the the bits to position 6
+    clc
+    lda oam_object.flip_h, X
+    ror ; Rotate puts into carry
+    ror ; And then put into position 7
+    ror ; And then put into position 6
+    ora 1, S
+    sta 1, S
+
+    ; Put the flip into the right place
+    ; Rotate the the bits to position 7
+    clc
+    lda oam_object.flip_v, X
+    ror ; Rotate puts into carry
+    ror ; And then put in position 7
+    ora 1, S
+    sta 1, S
 
     sta oam_manager.oam_table.low.w, Y
 
     ; Pop the stack
-    pla ; Priority
-    pla ; Flip H
-
-    pla ; Flip V
+    pla ; Value
 
     A16
     ply
@@ -429,8 +427,9 @@ OAMManager_Release:
     tyx
     jsr OAMObject_Init
     stz oam_object.allocated, X
-
     A16
+
+    jsr OAM_MarkDirty
 
     ply
     plx

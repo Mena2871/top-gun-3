@@ -144,8 +144,13 @@ class Helpers:
     OAM_SIZE_SMALL = 8
     """The small size of the OAM entry in pixels."""
 
+    OAM_SIZE_LARGE_PROG = 0x10 * 4
+    OAM_SIZE_SMALL_PROG = 0x10
+
     OAM_GROUP_TO_SIZE = { 'small': OAM_SIZE_SMALL, 'big': OAM_SIZE_LARGE }
     """Converts a size group to a size."""
+
+    OAM_GROUP_TO_PROG = { 'small': OAM_SIZE_SMALL_PROG, 'big': OAM_SIZE_LARGE_PROG }
 
     @staticmethod
     def rgb_to_bgr555(rgbpal: bytearray) -> bytearray:
@@ -176,7 +181,7 @@ class Helpers:
         if w < Helpers.OAM_SIZE_LARGE or h < Helpers.OAM_SIZE_LARGE:
             size = Helpers.OAM_SIZE_SMALL
             group = 'small'
-        num_tiles = max(w, h) // size
+        num_tiles = int(np.ceil(max(w, h) / size))
         return (size, group, num_tiles)
 
 
@@ -492,6 +497,7 @@ class SpriteHeader:
             name = layer["name"]
             logger_build.debug("\tFound layer %s", name)
             layer_names.append(name)
+        layer_names.reverse()
 
         direction_map = {
             "forward": 0,
@@ -557,9 +563,9 @@ class SpriteHeader:
                         logger_build.debug("\t\t\t%s: %s tile_size=%d (%dx%d)",
                             key, layer_name, tile_size, w, h)
                         k_tile = 0
-                        prog_ram_base = 16 * y // 8 + x // 8
-                        for i in range(h // tile_size):
-                            for j in range(w // tile_size):
+                        prog_ram_base = 16 * (y // 8) + (x // 8)
+                        for i in range(int(np.ceil(h / tile_size))):
+                            for j in range(int(np.ceil(w / tile_size))):
                                 # Build the tile header
                                 k_tile += 1
                                 tile_header = TileHeader()
@@ -569,7 +575,7 @@ class SpriteHeader:
                                 tile_header.ry = ry
 
                                 logger_build.debug("\t\t\t\tTile %d: %d,%d at %d,%d (%d, %d) (rom=%s)",
-                                    k_tile, j, i, x, y, rx, ry, hex(tile_header.prog_ram_addr * 16 + 0x6000))
+                                    k_tile, j, i, x, y, rx, ry, hex(tile_header.prog_ram_addr * 16 + 0x7000))
 
                                 # Add the tile header to the layer
                                 layer_header.tile_data.append(tile_header)
@@ -581,8 +587,9 @@ class SpriteHeader:
                             # Add new offsets
                             y += tile_size
                             ry += tile_size
-                            rx = 0
-                            prog_ram_base += 0x10
+                            rx = sss_data["x"]
+                            x = f_data["x"]
+                            prog_ram_base += Helpers.OAM_GROUP_TO_PROG[pretty_name]
                         frame_header.layer_data.append(layer_header)
                         layer_count += len(layer_header.tile_data)
                     oam_count = max(oam_count, layer_count)

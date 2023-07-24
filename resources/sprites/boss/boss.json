@@ -1,0 +1,45 @@
+{ "frames": {
+   "Idle__0__left_arm_low": {
+    "frame": { "x": 64, "y": 48, "w": 48, "h": 48 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 32, "w": 48, "h": 48 },
+    "sourceSize": { "w": 100, "h": 100 },
+    "duration": 100
+   },
+   "Idle__0__head": {
+    "frame": { "x": 0, "y": 0, "w": 64, "h": 80 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 32, "y": 0, "w": 64, "h": 80 },
+    "sourceSize": { "w": 100, "h": 100 },
+    "duration": 100
+   },
+   "Idle__0__right_arm_low": {
+    "frame": { "x": 64, "y": 0, "w": 64, "h": 48 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 32, "y": 32, "w": 64, "h": 48 },
+    "sourceSize": { "w": 100, "h": 100 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.2.40-x64",
+  "image": "boss.png",
+  "format": "RGBA8888",
+  "size": { "w": 128, "h": 96 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Idle", "from": 0, "to": 0, "direction": "forward" }
+  ],
+  "layers": [
+   { "name": "left_arm_low", "opacity": 255, "blendMode": "normal" },
+   { "name": "head", "opacity": 255, "blendMode": "normal" },
+   { "name": "right_arm_low", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

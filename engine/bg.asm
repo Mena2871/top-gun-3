@@ -62,6 +62,7 @@ BGManager_Init:
     ; Enable Mode 1 with 8x8 characters for all sizes
     ; BG3 is set to high priority
     ; Size is 8x8 characters for all BG modes.
+    ;     abcdefff
     lda #%00111001
     sta BGMODE
 

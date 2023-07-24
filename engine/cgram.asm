@@ -1,6 +1,7 @@
 
 .define CGRAM_ALLOCATED 0x1
 .define CGRAM_PALETTES 8
+.define CGRAM_TOTAL 16
 
 .ramsection "CGRAMManagerRAM" appendto "RAM"
     cgram_bg_manager ds CGRAM_PALETTES
@@ -15,31 +16,21 @@
 CGRAMManager_Init:
     pha
     phx
+    phy
 
     lda #0
-
     A8
     ldx #0
-    @LoopBG:
+    @Loop:
+        clc
         asl
         sta cgram_bg_manager.w, X
         inx
         txa
-        cpx #CGRAM_PALETTES
-        bne @LoopBG
-
-    lda #CGRAM_PALETTES
-    ldx #0
-    @LoopSprite:
-        asl
-        sta cgram_sprite_manager.w, X
-        inx
-        txa
-        cpx #CGRAM_PALETTES
-        bne @LoopSprite
-
+        cpx #CGRAM_TOTAL
+        bne @Loop
     A16
-
+    ply
     plx
     pla
     rts

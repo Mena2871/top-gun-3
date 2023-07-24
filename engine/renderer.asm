@@ -52,7 +52,7 @@ Renderer_Frame:
 Renderer_VBlank:
     pha
 
-    jsr Renderer_TestMoveScreenRight
+    ;jsr Renderer_TestMoveScreenRight
 
     @UpdateBGOffsets:
         .16bit

@@ -1,7 +1,6 @@
 ; Where in VRAM we will store our spritesheets
-.define SPRITE_CHAR_VRAM $6000
-.define SPRITE_SIZE $2000
-.define MAX_SPRITE_OBJECTS 8
+.define SPRITE_SIZE $1000
+.define MAX_SPRITE_OBJECTS 10
 
 ;
 ; A Tile is a single SNES object that makes up a larger sprite.
@@ -197,6 +196,7 @@
     bank       db      ; 8-bit bank number of the sprite
     ptr        dw      ; 16-bit pointer to the sprite data
     vram       dw      ; 16-bit pointer to the sprite data in VRAM
+    rel_vram   db      ; 8-bit relative offset
     tag        dw      ; 16-bit pointer to the active tag
     tag_idx    dw      ; 16-bit index of the active tag
     oams       ds  64  ; Array of 32 16-bit OAM pointers
@@ -207,6 +207,7 @@
     tile_count dw      ; Number of tiles in the active frame
     cgram_idx  db      ; 8-bit index of the palette in CGRAM
     priority   db      ; Background priority (0 to 3)
+    page       db      ; Which OAM page this is on
 .endst
 .enum $0000
     sprite_desc instanceof SpriteDescriptor
@@ -265,19 +266,20 @@ SpriteManager_Init:
     tax
 
     clc
-    lda #SPRITE_CHAR_VRAM
+    lda #OAM_PAGE0_ADDR
+    pha
 
     @Loop:
         ; Check if the sprite descriptor is allocated
-        stz sprite_desc.ptr
-        stz sprite_desc.oam_count
+        stz sprite_desc.ptr, X
+        stz sprite_desc.oam_count, X
 
         sta sprite_desc.vram, X
-        adc #SPRITE_SIZE
+        adc 1, S
 
         A8
-        stz sprite_desc.allocated
-        stz sprite_desc.bank
+        stz sprite_desc.allocated, X
+        stz sprite_desc.bank, X
 
         A16
         ; Advance the pointer
@@ -287,6 +289,11 @@ SpriteManager_Init:
         txa
         adc #_sizeof_SpriteDescriptor
         tax
+        
+        clc
+        lda 1, S
+        adc #SPRITE_SIZE
+        sta 1, S
         pla
         
         ; Did we reach the end of the sprite object space?
@@ -298,6 +305,7 @@ SpriteManager_Init:
         bra @Loop
 
     @Done:
+        pla
         plx
         pla
         rts
@@ -377,8 +385,11 @@ SpriteManager_Release:
     tyx
     stz sprite_desc.allocated, X
 
-    A16
+    ; TODO, if we release a sprite we need to clean up all the OAM space.
+    ; Then we need check if the VRAM is still in use by another sprite, if
+    ; not then release all that vram.
 
+    A16
     ply
     plx
     pla
@@ -442,10 +453,100 @@ Sprite_DeepCopy:
     lda sprite_desc.frame_idx, X
     jsr Sprite_SetFrame
 
+    tyx
+    jsr Sprite_MarkDirty
+
     ply
     plx
     pla
     rts
+
+Sprite_FindCopyAndLoad:
+    ; Before we even attempt to allocate this sprite, let's confirm that
+    ; it doesn't already exist in VRAM somewhere or has been previously
+    ; allocated. If so, then we're going to do a deep copy instead.
+    A8
+    phy
+    phx
+    pha
+
+    ; Advance the pointer to the first Sprite object in the struct
+    A16
+    clc
+    lda #sprite_manager.sprites
+    tax
+    lda #0
+
+    ; Iterate through the sprite objects annd find any that match the bank
+    ; and data registers. If we find one, then we'll do a deep copy instead.
+    ldy #0
+
+    @Loop:
+        lda #0
+        A8
+
+        ; Check if the sprite descriptor is allocated
+        lda sprite_desc.allocated, X
+        beq @@Next
+
+        ; Does the bank match?
+        lda sprite_desc.bank, X
+        cmp 1, S
+        bne @@Next
+
+        A16
+        ; Does the ROM pointer match?
+        lda sprite_desc.ptr, X
+        cmp 2, S
+        bne @@Next
+
+        ; Cool, copy this object!
+        bra @Found
+
+        ; Try the next sprite object
+        @@Next:
+            A16
+            ; Advance the pointer
+            clc
+            txa
+            adc #_sizeof_SpriteDescriptor
+            tax
+
+            ; Did we reach the end of the sprite object space?
+            iny
+            cpy #MAX_SPRITE_OBJECTS
+            beq @NotFound
+
+            ; Continue to the next iteration
+            bra @Loop
+
+    ; If we got here, then we found a matching object
+    @Found:
+        A16
+        lda 4, S
+        tay
+
+        jsr Sprite_DeepCopy
+
+        A8
+        pla
+        plx
+        ply
+        A16
+
+        lda #1
+        rts
+
+    ; If we got here, then no matches
+    @NotFound:
+        A8
+        pla
+        plx
+        ply
+        A16
+
+        lda #0
+        rts
 
 ;
 ; Expects Y register to be the pointer to the sprite descriptor
@@ -455,6 +556,21 @@ Sprite_Load:
     phb
     phx
     phy
+
+    ; FindCopyAndLoad will return 1 if it found a match and loaded it
+    pha
+    jsr Sprite_FindCopyAndLoad
+    cmp #1
+    bne @NotFound
+
+    ; If we got here, then we found a match and loaded it, pop the accumulator
+    @Found:
+        pla
+        bra @Done
+
+    ; If we got here, then we didn't find a match, so we need to continue
+    @NotFound:
+        pla
 
     ; Save the bank number in the sprite descriptor
     A8
@@ -496,6 +612,7 @@ Sprite_Load:
     ; Swap the registers to make X the primary struct and Y the descriptor
     jsr Sprite_Init
 
+    @Done:
     ply
     plx
     plb
@@ -561,7 +678,7 @@ Sprite_LoadPalette:
 
     ; Store the palette index in the map manager
     A8
-    lda sprite_desc.cgram_idx, Y
+    lda sprite_desc.cgram_idx.w, Y
     tay
     A16
 
@@ -790,11 +907,61 @@ Sprite_SetTag:
         phy
         bra @Done
 
+    ; Compute the cgram index to a 0..8 value
     @Done:
-        ply
+
+    A8
+    lda sprite_desc.page.w, Y
+    pha
+    clc
+    lda sprite_desc.cgram_idx.w, Y
+    lsr
+    pha
+    lda #16
+    sec
+    sbc 1, S
+    sta 1, S
+    lda #8
+    sbc 1, S
+    sta 1, S
+    A16
+
+    ; Iterate through each OAM object on this descriptor and
+    ; update the palette index and vram page
+
+    lda sprite_desc.oam_count, Y
+    tax
+    @OAMUpdate:
+        phx
+
+        lda sprite_desc.oams.w, Y
+        tax
+
+        ; Update the palette index
+        A8
+        lda 3, S
+        sta oam_object.palette, X
+
+        lda 4, S
+        sta oam_object.page, X
+        A16
+
         plx
-        pla
-        rts
+        iny
+        iny
+        dex
+        cpx #0
+        bne @OAMUpdate
+
+    A8
+    pla
+    pla
+
+    A16
+    ply
+    plx
+    pla
+    rts
 
 
 ;

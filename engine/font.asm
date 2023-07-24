@@ -315,7 +315,8 @@ FontManager_DrawStep:
     sbc #32
 
     sta VMDATAL
-    stz VMDATAH
+    lda #%00100000
+    sta VMDATAH
 
     ; Write zeros for the remaining tiles
     @Done:
@@ -383,7 +384,8 @@ FontManager_DrawAll:
         sbc #32
 
         sta VMDATAL
-        stz VMDATAH
+        lda #%00100000
+        sta VMDATAH
 
         iny
         inx
