@@ -22,9 +22,6 @@
     dynamic_text_buffer ds 8    ; Buffer for dynamic text
     test_sprite_ptr1 dw          ; Pointer to the requested test sprite
     test_sprite_ptr2 dw          ; Pointer to the requested test sprite
-    test_sprite_ptr3 dw          ; Pointer to the requested test sprite
-    test_sprite_ptr4 dw          ; Pointer to the requested test sprite
-    test_sprite_ptr5 dw          ; Pointer to the requested test sprite
 .endst
 
 .ramsection "GameRAM" appendto "RAM"
@@ -54,18 +51,6 @@ Game_Frame:
     jsr Sprite_MarkDirty
 
     ldx game.test_sprite_ptr2.w
-    inc sprite_desc.x, X
-    jsr Sprite_MarkDirty
-
-    ldx game.test_sprite_ptr3.w
-    inc sprite_desc.x, X
-    jsr Sprite_MarkDirty
-
-    ldx game.test_sprite_ptr4.w
-    inc sprite_desc.x, X
-    jsr Sprite_MarkDirty
-
-    ldx game.test_sprite_ptr5.w
     inc sprite_desc.x, X
     jsr Sprite_MarkDirty
 
@@ -167,37 +152,9 @@ Game_Init:
     sta sprite_desc.y, Y
     A16
 
-    ; Request another sprite descriptor
-    jsr SpriteManager_Request
-    sty game.test_sprite_ptr3.w
-
-    ; Copy from X -> Y
-    ldx game.test_sprite_ptr1.w
-    jsr Sprite_DeepCopy
-
-    A8
-    lda #15
-    sta sprite_desc.x, Y
-
-    lda #100
-    sta sprite_desc.y, Y
-    A16
-
-    ; Request another sprite descriptor
-    jsr SpriteManager_Request
-    sty game.test_sprite_ptr4.w
-
-    ; Copy from X -> Y
-    ldx game.test_sprite_ptr1.w
-    jsr Sprite_DeepCopy
-
-    A8
-    lda #50
-    sta sprite_desc.x, Y
-
-    lda #150
-    sta sprite_desc.y, Y
-    A16
+    ; Initialize Characters
+    ldx #game.characters
+    jsr Characters_Init
 
     ; Request another sprite descriptor
     jsr SpriteManager_Request
@@ -232,10 +189,6 @@ Game_Init:
     tyx
     lda #8
     jsr Timer_Init
-
-    ; Initialize Characters
-    ldx #game.characters
-    jsr Characters_Init
 
     ; Initialize the players
     ldy #game.characters.character_1
