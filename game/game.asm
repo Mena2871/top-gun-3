@@ -156,22 +156,6 @@ Game_Init:
     ldx #game.characters
     jsr Characters_Init
 
-    ; Request another sprite descriptor
-    jsr SpriteManager_Request
-    sty game.test_sprite_ptr5.w
-
-    ; Copy from X -> Y
-    ldx game.test_sprite_ptr1.w
-    jsr Sprite_DeepCopy
-
-    A8
-    lda #100
-    sta sprite_desc.x, Y
-
-    lda #75
-    sta sprite_desc.y, Y
-    A16
-
     ; Load a demo map
     lda #Map_Skyscraper@Bank
     ldy #Map_Skyscraper@Data
