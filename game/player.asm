@@ -1,7 +1,3 @@
-.section "Player" BANK 0 SLOT "ROM"
-
-nop
-
 .struct Player
     id               db ; Player ID
     oam_obj_ptr      dw ; Pointer to the requested OAM object
@@ -12,6 +8,9 @@ nop
 .enum $0000
     player instanceof Player
 .ende
+
+.section "Player" BANK 0 SLOT "ROM"
+nop
 
 Player_Init:
     phy

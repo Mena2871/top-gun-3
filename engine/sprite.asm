@@ -282,10 +282,13 @@ SpriteManager_Init:
         A16
         ; Advance the pointer
         clc
+
+        pha
         txa
         adc #_sizeof_SpriteDescriptor
         tax
-
+        pla
+        
         ; Did we reach the end of the sprite object space?
         iny
         cpy #MAX_SPRITE_OBJECTS
