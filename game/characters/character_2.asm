@@ -31,7 +31,7 @@ Character_2_Init:
     plx
 
     ; Save pointer to the sprite
-    sty character_2.sprite_ptr.w
+    sty character_2.sprite_ptr.w, X
 
     A8
     lda #50
