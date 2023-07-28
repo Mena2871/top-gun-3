@@ -156,10 +156,6 @@ Game_Init:
     ldx #game.characters
     jsr Characters_Init
 
-    ; Request another sprite descriptor
-    jsr SpriteManager_Request
-    sty game.test_sprite_ptr5.w
-
     ; Copy from X -> Y
     ldx game.test_sprite_ptr1.w
     jsr Sprite_DeepCopy
