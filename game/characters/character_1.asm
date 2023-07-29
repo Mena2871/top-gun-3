@@ -20,6 +20,9 @@ Character_1_Init:
 
     lda #3
     sta character_1.character_attr.speed, X
+
+    lda #2
+    sta character_1.character_attr.turbo_multi, X
     A16
 
     ; Load a sprite

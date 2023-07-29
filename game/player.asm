@@ -228,13 +228,34 @@ Player_RhtBtn:
     A8
     clc
     lda sprite_desc.x, X
+    pha
 
     ; Modify Sprite Location
     iny
     iny
-    adc character_attr.speed, Y
+
+    lda character_attr.speed, Y
+    sta WRMPYA
+
+    lda character_attr.turbo_multi, Y
+    sta WRMPYB
+
+    nop
+    nop
+    nop
+    nop
+
+    lda RDMPYL
+    adc RDMPYH
+    tay
+
+    pla
+    phy
+    clc
+    adc 1, S
     sta sprite_desc.x, X
     jsr Sprite_MarkDirty
+    ply
 
     A16
     jsr Renderer_TestMoveScreenRight
