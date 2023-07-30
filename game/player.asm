@@ -89,8 +89,9 @@ Player_UpBtn:
     and #1
     beq @Done
 
+    phx
     ; Restore X pointing to the player object
-    lda 1, S
+    lda 3, S
     tax
 
     ; Now use X and Y index registers for oam object and char object pointers
@@ -98,21 +99,32 @@ Player_UpBtn:
     ina
     tay
 
-    ; Load Sprite Pointer
-    lda $00, Y
-    tax
-    A8
-    sec
-    lda sprite_desc.y, X
+    ; Load Input Pointer
+    plx
 
-    ; Modify Sprite Location
-    iny
-    iny
-    sbc character_attr.speed, Y
-    sta sprite_desc.y, X
-    jsr Sprite_MarkDirty
+    ; Load Player Speed
+    lda character_attr.speed, Y
 
-    A16
+    pha ; Store Speed
+
+    @Move_Sprite:
+        iny
+        iny
+        iny
+        A16
+        lda $00, Y
+        tax
+
+        ; Load Sprite Info
+        A8
+        lda sprite_desc.y, X
+        sec
+        sbc 1, S
+        sta sprite_desc.y, X
+        jsr Sprite_MarkDirty
+
+        pla
+        A16
 
     @Done:
         plx
@@ -130,8 +142,9 @@ Player_DnBtn:
     and #1
     beq @Done
 
+    phx
     ; Restore X pointing to the player object
-    lda 1, S
+    lda 3, S
     tax
 
     ; Now use X and Y index registers for oam object and char object pointers
@@ -139,21 +152,32 @@ Player_DnBtn:
     ina
     tay
 
-    ; Load Sprite Pointer
-    lda $00, Y
-    tax
-    A8
-    clc
-    lda sprite_desc.y, X
+    ; Load Input Pointer
+    plx
 
-    ; Modify Sprite Location
-    iny
-    iny
-    adc character_attr.speed, Y
-    sta sprite_desc.y, X
-    jsr Sprite_MarkDirty
+    ; Load Player Speed
+    lda character_attr.speed, Y
 
-    A16
+    pha ; Store Speed
+
+    @Move_Sprite:
+        iny
+        iny
+        iny
+        A16
+        lda $00, Y
+        tax
+
+        ; Load Sprite Info
+        A8
+        lda sprite_desc.y, X
+        clc
+        adc 1, S
+        sta sprite_desc.y, X
+        jsr Sprite_MarkDirty
+
+        pla
+        A16
 
     @Done:
         plx
@@ -171,8 +195,9 @@ Player_LftBtn:
     and #1
     beq @Done
 
+    phx
     ; Restore X pointing to the player object
-    lda 1, S
+    lda 3, S
     tax
 
     ; Now use X and Y index registers for oam object and char object pointers
@@ -180,21 +205,33 @@ Player_LftBtn:
     ina
     tay
 
-    ; Load Sprite Pointer
-    lda $00, Y
-    tax
-    A8
-    sec
-    lda sprite_desc.x, X
+    ; Load Input Pointer
+    plx
 
-    ; Modify Sprite Location
-    iny
-    iny
-    sbc character_attr.speed, Y
-    sta sprite_desc.x, X
-    jsr Sprite_MarkDirty
+    ; Load Player Speed
+    lda character_attr.speed, Y
 
-    A16
+    pha ; Store Speed
+
+    @Move_Sprite:
+        iny
+        iny
+        iny
+        A16
+        lda $00, Y
+        tax
+
+        ; Load Sprite Info
+        A8
+        lda sprite_desc.x, X
+        sec
+        sbc 1, S
+        sta sprite_desc.x, X
+        jsr Sprite_MarkDirty
+
+        pla
+        A16
+
     jsr Renderer_TestMoveScreenLeft
 
     @Done:
@@ -213,8 +250,9 @@ Player_RhtBtn:
     and #1
     beq @Done
 
+    phx
     ; Restore X pointing to the player object
-    lda 1, S
+    lda 3, S
     tax
 
     ; Now use X and Y index registers for oam object and char object pointers
@@ -222,42 +260,74 @@ Player_RhtBtn:
     ina
     tay
 
-    ; Load Sprite Pointer
-    lda $00, Y
-    tax
-    A8
-    clc
-    lda sprite_desc.x, X
+    ; Load Input Pointer
+    plx
+
+    ; Store tag
+    lda #Sprite_Plane@Tag@Forward
     pha
 
-    ; Modify Sprite Location
-    iny
-    iny
-
+    ; Load Player Speed
     lda character_attr.speed, Y
-    sta WRMPYA
 
-    lda character_attr.turbo_multi, Y
-    sta WRMPYB
+    pha ; Store Speed
+    
+    lda inputstate.rbtn, X
+    cmp #1
+    bne @Move_Sprite
 
-    nop
-    nop
-    nop
-    nop
+    @Turbo:
+        pla
+        sta WRMPYA
 
-    lda RDMPYL
-    adc RDMPYH
-    tay
+        pla ; Pull tag and update
+        lda #Sprite_Plane@Tag@Forward_Afterburner
+        pha
 
-    pla
-    phy
-    clc
-    adc 1, S
-    sta sprite_desc.x, X
-    jsr Sprite_MarkDirty
-    ply
+        A8
+        lda character_attr.turbo_multi, Y
+        sta WRMPYB
 
-    A16
+        nop
+        nop
+        nop
+        nop
+
+        lda RDMPYL
+        clc
+        adc RDMPYH
+        A16
+        pha
+
+
+
+    @Move_Sprite:
+        iny
+        iny
+        iny
+        A16
+        lda $00, Y
+        tax
+
+        ; Load Sprite Info
+        A8
+        lda sprite_desc.x, X
+        clc
+        adc 1, S
+        sta sprite_desc.x, X
+        jsr Sprite_MarkDirty
+
+        pla
+        pla
+        A16
+
+        txy
+        jsr Sprite_SetTag
+        
+        ; Set the frame of the sprite to 0
+        lda #0
+        jsr Sprite_SetFrame
+
     jsr Renderer_TestMoveScreenRight
 
     @Done:

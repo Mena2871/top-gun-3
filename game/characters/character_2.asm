@@ -1,7 +1,7 @@
 .struct Character_2
     id         db ; Character ID
-    sprite_ptr dw ; Sprite pointer
     character_attr instanceof Character_Attr
+    sprite_ptr dw ; Sprite pointer
 .endst
 
 .enum $0000
