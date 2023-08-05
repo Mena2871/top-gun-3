@@ -9,15 +9,6 @@
 ;
 .define MAX_OAM_OBJECTS 128
 
-; OAM page 0 can be aligned at $0000, $2000, $4000, or $6000 word
-; OAM page 1 can be aligned at page 0 + $1000, $2000, $3000, or $4000 word
-.define OAM_PAGE0_ADDR $6000          ; BBB = 011 ($6000)
-.define OAM_PAGE1_ADDR $7000          ; PP  = 00  ($6000 + $1000)
-;.define OAM_DEFAULT_OBJSEL %00000011  ; 8x8/16x16 Page 0 @ $6000, Page 1 @ $7000
-
-;  (intentionally aligned with BG1 for testing)
-; Remember these are 16-bit word addresses
-.define OAM_DEFAULT_OBJSEL %00100011  ; 8x8/16x16 Page 0 @ $6000, Page 1 @ $7000
 
 .struct OAMTable
     low ds 512

@@ -266,7 +266,7 @@ SpriteManager_Init:
     tax
 
     clc
-    lda #OAM_PAGE0_ADDR
+    lda #OAM_PAGE2_ADDR
     pha
 
     @Loop:
@@ -274,6 +274,7 @@ SpriteManager_Init:
         stz sprite_desc.ptr, X
         stz sprite_desc.oam_count, X
 
+        lda #OAM_PAGE1_ADDR
         sta sprite_desc.vram, X
         adc 1, S
 
@@ -1140,6 +1141,9 @@ Sprite_SetFrame:
                 sta oam_object.y
 
                 lda tile_hdr.prog_ram_addr.w, X
+
+                ; Add in the offset of the VRAM address for the page that it
+                ; is in, so that the resulting vram entry is correct
                 sta oam_object.vram
 
                 lda #1
