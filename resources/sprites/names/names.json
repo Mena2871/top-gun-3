@@ -1,0 +1,78 @@
+{ "frames": {
+   "Mav__0__Flattened": {
+    "frame": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   },
+   "Ice__0__Flattened": {
+    "frame": { "x": 24, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   },
+   "Ice__1__Flattened": {
+    "frame": { "x": 48, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   },
+   "Ice__2__Flattened": {
+    "frame": { "x": 72, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   },
+   "Vip__0__Flattened": {
+    "frame": { "x": 48, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   },
+   "Vip__1__Flattened": {
+    "frame": { "x": 72, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   },
+   "Goose__0__Flattened": {
+    "frame": { "x": 72, "y": 0, "w": 24, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 8 },
+    "sourceSize": { "w": 24, "h": 8 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.2.40-x64",
+  "image": "names.png",
+  "format": "I8",
+  "size": { "w": 128, "h": 8 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Mav", "from": 0, "to": 0, "direction": "forward" },
+   { "name": "Ice", "from": 1, "to": 3, "direction": "forward" },
+   { "name": "Vip", "from": 2, "to": 3, "direction": "forward" },
+   { "name": "Goose", "from": 3, "to": 3, "direction": "forward" }
+  ],
+  "layers": [
+   { "name": "Flattened", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

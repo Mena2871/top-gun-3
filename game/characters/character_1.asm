@@ -2,6 +2,7 @@
     id         db ; Character ID
     character_attr instanceof Character_Attr
     sprite_ptr dw ; Sprite pointer
+    name_ptr  dw ; Name pointer
 .endst
 
 .enum $0000
@@ -52,7 +53,55 @@ Character_1_Init:
     lda #0
     jsr Sprite_SetFrame
 
+    phx
+    tyx
+    jsr Sprite_MarkDirty
+    plx
+
+    ; Load name sprite
+    @LoadNames:
+        phx
+        jsr SpriteManager_Request
+
+        lda #$7E00
+        sta sprite_desc.vram, Y
+
+        A8
+        lda #1
+        sta sprite_desc.page, Y
+        A16
+
+        lda #Sprite_Names@Bank
+        ldx #Sprite_Names@Data
+        jsr Sprite_Load 
+        plx
+
+        ; Save pointer to the sprite
+        sty character_1.name_ptr.w, X
+
+        A8
+        lda #70
+        sta sprite_desc.x, Y
+
+        lda #174
+        sta sprite_desc.y, Y
+        A16
+
+        tyx
+
+        ; Set the tag of the sprite to the Forward animation
+        lda #Sprite_Names@Tag@Mav
+        jsr Sprite_SetTag
+
+        ; Set the frame of the sprite to 0
+        lda #0
+        jsr Sprite_SetFrame
+        jsr Sprite_MarkDirty
+
     ply
+    plx
     rts
+
+
 
 .ends

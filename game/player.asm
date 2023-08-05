@@ -63,6 +63,56 @@ Player_OAMRequest:
 
 Player_Frame:
     jsr Player_Input
+    jsr Player_SetBadgeLocation
+    rts
+
+Player_SetBadgeLocation:
+    ; Calculate relative offsets for the player name tags
+    phx
+
+    lda player.char_obj_ptr, X
+    tax
+
+    ; Get the main sprite position and then add x += 20, y += 24
+    phx
+    lda character_1.sprite_ptr, X 
+
+    ; Create temporary variables for the sprite offsets
+    tax
+    A8
+    lda sprite_desc.x, X
+    pha
+    lda sprite_desc.y, X
+    pha
+    A16
+
+    lda 3, S
+    tax
+
+    lda character_1.name_ptr, X
+    tax
+
+    A8
+    clc
+    lda #20
+    adc 2, S
+    sta sprite_desc.x, X
+
+    clc
+    lda #24
+    adc 1, S
+    sta sprite_desc.y, X
+    A16
+
+    jsr Sprite_MarkDirty
+
+    A8
+    pla ; Restore y
+    pla ; Restore X
+    plx ; Restore Sprite Pointer
+    plx ; Restore Player Pointer
+    A16
+
     rts
 
 Player_Input:

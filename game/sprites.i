@@ -9,3 +9,8 @@ nop
 nop
 .include "resources/sprites/boss/boss.i"
 .ends
+
+.section "Names" bank 6 slot "ROM"
+nop
+.include "resources/sprites/names/names.i"
+.ends
