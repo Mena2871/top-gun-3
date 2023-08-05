@@ -169,6 +169,62 @@ class Helpers:
         return b"".join(_.to_bytes() for _ in data)
 
     @staticmethod
+    def tesselate_surface(w: int, h: int):
+        """
+        Greedy tesselation algorithm to count the number of tiles needed to
+        fill a surface of width w and height h.
+        """
+        LARGE = Helpers.OAM_SIZE_LARGE
+        SMALL = Helpers.OAM_SIZE_SMALL
+
+        # Ensure that width and height are divisible by the smallest tile size
+        assert w % SMALL == 0 and h % SMALL == 0, f"Width and height must be divisible by {SMALL}"
+
+        # List of tiles we will generate for this sprite
+        tiles_large = []
+        tiles_small = []
+
+        # Initialize the top-left coordinates relative to the sprite
+        x, y = 0
+
+        max_large_area = LARGE * LARGE
+        max_small_area = SMALL * SMALL
+
+        # Calculate the total area of the sprite
+        total_area = w * h
+
+        # Fill the sprite with squares
+        while total_area > 0:
+            # Try to fit a large square
+            if (total_area >= max_large_area
+                and x + LARGE <= w
+                and y + LARGE <= h):
+
+                # Build tile list
+                tiles_large.append((x, y, LARGE, LARGE))
+                total_area -= max_large_area
+
+                # If we reach the right edge, move down
+                if x == w:
+                    x = 0
+                    y += LARGE
+
+            # Otherwise, fit a small square
+            else:
+                # Build tile list
+                tiles_small.append((x, y, SMALL, SMALL))
+                total_area -= max_small_area
+                x += 8
+
+                if x == w:
+                    x = 0
+                    y += SMALL
+
+        # Return the counts of squares
+        return (tiles_large, tiles_small)
+
+
+    @staticmethod
     def oam_to_size_group(w: int, h: int) -> Tuple[int, str, int]:
         """
         Converts the width and height of a tile to a size group.
@@ -531,7 +587,7 @@ class SpriteHeader:
                     key = f"{tag_name}__{tag_frame}__{layer_name}"
                     obj = data_frames.get(key)
                     if not obj:
-                        logger_build.debug("\t\t\tSkipping %s", key)
+                        logger_build.debug("\t\t\tSkipping '%s'", key)
                         continue
 
                     # Build the layer header
