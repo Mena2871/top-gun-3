@@ -1,14 +1,3 @@
-; Tilemaps are 2KB blocks of VRAM
-.define BG1_TILEMAP_VRAM $1000
-.define BG2_TILEMAP_VRAM $1400
-.define BG3_TILEMAP_VRAM $1800
-
-; Remember, these are 16-bit words
-.define BG1_CHAR_VRAM    $3000
-.define BG2_CHAR_VRAM    $3000
-.define BG3_CHAR_VRAM    $5000
-.define BG4_CHAR_VRAM    $5000
-
 ; 5 bits are used to address the 64K of VRAM.
 .define BG_SIZE_32_32 0
 .define BG_SIZE_64_32 1

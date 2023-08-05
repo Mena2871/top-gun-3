@@ -121,6 +121,11 @@ Game_FontInit:
     phx
     phy
 
+    ; Load Font 8x8 into Slot 0
+    lda #Font_8x8@Bank
+    ldy #Font_8x8@Data
+    jsr FontManager_Load
+
     ply
     plx
     pla
