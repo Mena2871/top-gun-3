@@ -355,6 +355,8 @@ Player_RhtBtn:
         iny
         iny
         iny
+        iny
+        iny
         A16
         lda $00, Y
         tax

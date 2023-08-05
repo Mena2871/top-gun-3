@@ -13,11 +13,18 @@
 nop
 
 Character_1_Init:
+    phx
     phy
 
     A8
     lda #1
     sta character_1.id, X
+
+    lda #100
+    sta character_1.character_attr.health, X
+
+    lda #100
+    sta character_1.character_attr.max_health, X
 
     lda #3
     sta character_1.character_attr.speed, X
