@@ -320,10 +320,6 @@ Debug_TestClockUIInit:
     lda #0
     jsr Memset
 
-    ; Load Font 8x8 into Slot 0
-    lda #Font_8x8@Bank
-    ldy #Font_8x8@Data
-    jsr FontManager_Load
 
     ;Save pointer to font VRAM info
     lda #font_manager.fonts.1

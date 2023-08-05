@@ -215,6 +215,9 @@ FontManager_Load:
     plb
     rts
 
+;
+; Requests a font surface and store it in Y
+;
 FontManager_RequestSurface:
     pha
     phx
