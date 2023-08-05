@@ -273,7 +273,7 @@ Debug_TestBossSpriteLoadingInit:
     A16
 
     lda #Sprite_Boss@Bank
-    ldx #Sprite_Plane@Data
+    ldx #Sprite_Boss@Data
     jsr Sprite_Load 
 
     ; Save pointer to the sprite
