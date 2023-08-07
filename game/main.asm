@@ -14,6 +14,7 @@
 .include "common/lib/queue.i"
 .include "common/lib/stack.i"
 .include "debug/debug.asm"
+.include "common/pool.asm"
 .include "game/game.asm"
 
 .define STACK $1FFF
@@ -66,6 +67,10 @@ Main:
     sec
     sbc #_sizeof_Malloc
     jsr Malloc_Bytes
+
+    .ifeq DEBUG_PoolTest 1
+        jsr Main@PoolTest
+    .endif
 
     ; Initialize the game
     jsr Game_Init

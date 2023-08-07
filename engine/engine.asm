@@ -2,7 +2,6 @@
 .INDEX 16
 
 .include "engine/drivers/snes/interface.asm"
-.include "engine/vram.asm"
 .include "engine/bg.asm"
 .include "engine/input.asm"
 .include "engine/map.asm"
@@ -29,7 +28,6 @@ Engine_Init:
     stz engine.frame_counter.w
 
     jsr SNES_Init
-    jsr VRAMManager_Init
     jsr OAMManager_Init
     jsr BGManager_Init
     jsr CGRAMManager_Init

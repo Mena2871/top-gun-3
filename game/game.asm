@@ -24,6 +24,8 @@
     game instanceof Game        ; Pointer to the game struct
 .ends
 
+.include "debug/debug_game.asm"
+
 .section "Game" bank 0 slot "ROM"
 nop ; This is here to prevent the compiler from optimizing the label away
 

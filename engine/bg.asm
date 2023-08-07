@@ -1,3 +1,33 @@
+; Tilemap VRAM ranges
+.define BG1_TILEMAP_VRAM    $1000
+.define BG2_TILEMAP_VRAM    $1400
+.define BG3_TILEMAP_VRAM    $1800
+
+; Compute the end of the tilemap vram
+.define BG1_TILEMAP_VRAM_END (BG2_TILEMAP_VRAM - 1)
+.define BG2_TILEMAP_VRAM_END (BG3_TILEMAP_VRAM - 1)
+.define BG3_TILEMAP_VRAM_END $1C00
+
+; Compute VRAM ranges for BG1 and BG2 tilemaps
+.define BG_TILEMAP_VRAM_START BG1_TILEMAP_VRAM
+.define BG_TILEMAP_VRAM_END   BG3_TILEMAP_VRAM_END
+
+; Character VRAM ranges
+.define BG1_CHAR_VRAM       $3000
+.define BG2_CHAR_VRAM       $3000
+.define BG3_CHAR_VRAM       $5000
+.define BG4_CHAR_VRAM       $5000
+
+; Compute the end of the character vram
+.define BG1_CHAR_VRAM_END   (BG3_CHAR_VRAM - 1)
+.define BG2_CHAR_VRAM_END   (BG3_CHAR_VRAM - 1)
+.define BG3_CHAR_VRAM_END   $5FFF
+.define BG4_CHAR_VRAM_END   $5FFF
+
+; Range of VRAM that can be used for BG1 and BG2 tilemaps
+.define BG_CHAR_VRAM_START  BG1_CHAR_VRAM
+.define BG_CHAR_VRAM_END    BG4_CHAR_VRAM_END
+
 ; 5 bits are used to address the 64K of VRAM.
 .define BG_SIZE_32_32 0
 .define BG_SIZE_64_32 1
@@ -14,6 +44,7 @@
 
 .struct BGInfo
     next_char_vram dw ; Next available character VRAM address
+    vram_chunk dw
 .endst
 
 .struct BGManager
@@ -33,6 +64,7 @@ nop
 ;
 BGManager_Init:
     pha
+    phy
 
     ; BG1 is 8x8 characters at 32x32 tiles at 4BPP
     lda #BG1_CHAR_VRAM
@@ -77,6 +109,7 @@ BGManager_Init:
 
     A16
 
+    ply
     pla
     rts
 
