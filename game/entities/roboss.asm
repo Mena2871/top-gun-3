@@ -15,8 +15,8 @@ nop
     base.type:       .dw ENTITY_TYPE_BOSS
     base.health:     .db 100
     base.max_health: .db 100
-    base.w:          .db 32
-    base.h:          .db 32
+    base.width:          .db 32
+    base.height:          .db 32
     num_projectiles: .db 0
 .endst
 

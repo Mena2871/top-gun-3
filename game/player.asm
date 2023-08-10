@@ -64,6 +64,7 @@ Player_OAMRequest:
 Player_Frame:
     jsr Player_Input
     jsr Player_SetBadgeLocation
+    jsr EntityManager_Frame
     rts
 
 Player_SetBadgeLocation:
@@ -123,6 +124,7 @@ Player_Input:
     jsr Player_DnBtn
     jsr Player_LftBtn
     jsr Player_RhtBtn
+    jsr Player_ABtn
 
     pla
     rts
@@ -158,11 +160,8 @@ Player_UpBtn:
     pha ; Store Speed
 
     @Move_Sprite:
-        iny
-        iny
-        iny
         A16
-        lda $00, Y
+        lda $05, y
         tax
 
         ; Load Sprite Info
@@ -211,11 +210,8 @@ Player_DnBtn:
     pha ; Store Speed
 
     @Move_Sprite:
-        iny
-        iny
-        iny
         A16
-        lda $00, Y
+        lda $05, y
         tax
 
         ; Load Sprite Info
@@ -264,11 +260,8 @@ Player_LftBtn:
     pha ; Store Speed
 
     @Move_Sprite:
-        iny
-        iny
-        iny
         A16
-        lda $00, Y
+        lda $05, y
         tax
 
         ; Load Sprite Info
@@ -352,13 +345,8 @@ Player_RhtBtn:
 
 
     @Move_Sprite:
-        iny
-        iny
-        iny
-        iny
-        iny
         A16
-        lda $00, Y
+        lda $05, y
         tax
 
         ; Load Sprite Info
@@ -386,4 +374,62 @@ Player_RhtBtn:
         plx
         rts
 
+Player_ABtn:
+    phx
+
+    ; Load Input State Pointer
+    lda player.input_obj_ptr, X
+    tax
+
+    ; Check if Up Button is pressed
+    lda inputstate.abtn, X
+    and #1
+    beq @Done
+
+    phx
+    ; Restore X pointing to the player object
+    lda 3, S
+    tax
+
+    ; Now use X and Y index registers for oam object and char object pointers
+    lda player.char_obj_ptr, X
+    ina
+    tay
+
+    lda $05, y
+    tax
+
+    A8
+    lda sprite_desc.x, X
+    pha
+
+    lda sprite_desc.y, X
+    pha
+
+    A16
+    jsr EntityManager_Request
+    lda #ENTITY_TYPE_PLANE
+    sta entity.type, Y
+
+    jsr Entity_Load
+
+    A8
+    pla
+    sta entity.y, Y
+
+    pla
+    sta entity.x, Y
+
+    lda #1
+    sta entity.enabled, Y
+
+    lda #1
+    sta entity.allocated, Y
+
+    A16
+    plx
+
+    @Done:
+        plx
+        rts
 .ends

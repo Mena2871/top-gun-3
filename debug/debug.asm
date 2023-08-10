@@ -14,4 +14,4 @@
 .define DEBUG_POOL_ALLOCATOR        0   ; Exercises the pool allocator
 
 ; ======================== ENTITIES =======================================
-.define DEBUG_ENTITY_MANAGER        1   ; Exercises the entity allocator
+.define DEBUG_ENTITY_MANAGER        0   ; Exercises the entity allocator

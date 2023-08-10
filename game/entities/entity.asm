@@ -26,8 +26,8 @@
     ; Position data for aabb collision
     x         db     ; The x position of the entity
     y         db     ; The y position of the entity
-    w         db     ; The width of the entity
-    h         db     ; The height of the entity
+    width         db     ; The width of the entity
+    height         db     ; The height of the entity
 
     ; Rendering attributes
     sprite_ptr  dw    ; Pointer to the sprite descriptor
@@ -60,8 +60,8 @@
     base.type:          .dw ENTITY_TYPE_NONE
     base.health:        .db 100
     base.max_health:    .db 100
-    base.w:             .db 8
-    base.h:             .db 8
+    base.width:             .db 8
+    base.height:             .db 8
 .endst
 
 EntityManager_Init:

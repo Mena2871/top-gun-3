@@ -20,8 +20,8 @@ nop
     base.type:          .dw ENTITY_TYPE_PLANE
     base.health:        .db 100
     base.max_health:    .db 100
-    base.w:             .db 64
-    base.h:             .db 32
+    base.width:             .db 64
+    base.height:             .db 32
     weapon:             .db WEAPON_TYPE_MACHINE_GUN
     speed:              .db SPEED_TYPE_NORMAL
     turbo_multi:        .db 1
@@ -44,7 +44,25 @@ Plane_Init:
     rts
 
 Plane_Frame:
-    brk
-    rts
+    phy
+    A8
+
+    lda plane.base.x, Y
+    cmp #0
+    bne @Move
+    jsr EntityManager_Release
+    bra @Done
+
+    @Move:  
+        ina
+        sta plane.base.x, Y
+
+        A16
+        jsr Entity_MarkDirty
+
+
+    @Done:
+        ply
+        rts
 
 .ends
